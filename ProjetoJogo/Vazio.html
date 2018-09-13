@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=800, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui, shrink-to-fit=no" />
+
+	<title>Meu Joguinho</title>
+	
+	<style type="text/css">
+		body {
+			background: #000;
+			padding: 0;
+			margin: 0;
+			color: #fff;
+			font: normal 14px sans-serif;
+		}
+
+		canvas {
+			display: block;
+			margin: 0 auto;
+            
+		}
+	</style>
+</head>
+<body>
+
+	<div id="divJogo"></div>
+
+	<script type="text/javascript" src="phaser.min.js"></script>
+	<script type="text/javascript">
+	//<![CDATA[
+	"use strict";
+
+	// Essa não é a forma mais "prosissional" de fazer, mas é a mais simples :)
+
+	// Vamos chamar a variável de game, para ficar igual ao sandbox!
+	var game = new Phaser.Game(1280, 720, Phaser.AUTO, "divJogo");
+
+	function TelaInicial(game) {
+
+		// A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
+		this.init = function () {
+
+			game.input.maxPointers = 1;
+
+			// Deixar o jogo executando, mesmo se o browser mudar de aba?
+			game.stage.disableVisibilityChange = true;
+
+			if (game.device.desktop) {
+				// Configurações específicas para desktop
+
+				// Como criamos o CSS acima, não precisamos centralizar via código
+				game.scale.pageAlignHorizontally = false;
+			} else {
+				// Configurações específicas para celulares
+
+				game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+				// Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
+				game.scale.setMinMax(400, 300, 800, 600);
+				game.scale.forceLandscape = true;
+				// Como criamos o CSS acima, não precisamos centralizar via código
+				game.scale.pageAlignHorizontally = false;
+			}
+
+		}
+
+		this.preload = function () {          
+			game.load.crossOrigin = "anonymous";
+            
+            game.load.spritesheet('rio', 'Sprites/fundo.jpg');
+            game.load.spritesheet('player', 'Sprites/phaser-dude.png');
+            game.load.spritesheet('ship', 'Sprites/ship.png');
+            game.load.image('asteroid', 'http://examples.phaser.io/assets/games/asteroids/asteroid1.png');
+            game.load.physics('physicsData', 'http://examples.phaser.io/assets/physics/sprites.json');
+            game.load.image('bullet', 'http://examples.phaser.io/assets/sprites/purple_ball.png');
+		}
+        
+            
+        
+        var barco;
+        var cursors;
+        var player;
+        var balas;
+        var bala;
+        var atira;
+        
+        var bulletTime = 0;
+        var fireInterval = 200;
+		var timeUltimoTiro = 0;
+        var nextFire = 0;
+        
+		this.create = function () {
+            
+        game.stage.backgroundColor = "#3498db"; 
+        game.physics.startSystem(Phaser.Physics.P2JS);
+        
+        //fundo
+        game.add.sprite(0,0, 'rio'); 
+        
+        //Cria sprites
+        player = game.add.sprite(game.world.randomX,game.world.randomY, 'player');         
+        barco = game.add.sprite(game.world.randomX,game.world.randomY, 'ship');     
+        
+        //adiciona fisica nas sprites
+	    game.physics.p2.enable([barco,player], true);
+        //Fixa a rotação do barco
+        barco.body.fixedRotation = true;
+        
+            
+        //barco.body.clearShapes();
+        //barco.body.loadPolygon('physicsData', 'ship');
+            
+        cursors = game.input.keyboard.createCursorKeys();       
+            
+        balas = game.add.group();  
+        balas.enableBody = true;
+        balas.createMultiple(50, 'bullet');
+        
+        
+            
+        //Colisão com o fim do jogo e deleta bala ao colidir com o fim
+
+        
+         atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            
+        console.log(bala);
+        }
+        
+
+
+		this.update = function () {
+            
+        barco.body.setZeroVelocity();
+            
+        if (cursors.left.isDown)
+            {
+    	       barco.body.moveLeft(400);
+            }
+        else if (cursors.right.isDown)
+            {
+    	       barco.body.moveRight(400);
+            }
+
+        if (cursors.up.isDown)
+            {
+    	       barco.body.moveUp(400);
+            }
+        else if (cursors.down.isDown)
+            {
+    	      barco.body.moveDown(400);
+            }
+        
+        //Clicar para atirar
+        if (atira.isDown)
+        {
+			var agora = game.time.now;
+			var deltaT = agora - timeUltimoTiro;
+			if (deltaT >= fireInterval) {
+				timeUltimoTiro = agora;
+				fire();
+			}
+        }
+
+        game.physics.arcade.overlap(balas, player, collisionHandler, null, this);
+            
+            
+		}
+
+
+function fire() {
+    
+    bala = game.add.sprite(barco.x,(barco.y - 66), 'bullet');
+    
+    game.physics.p2.enable(bala, true);
+    bala.body.velocity.y = -650;
+    bala.body.setCircle(8.5);
+    
+
+}
+function collisionHandler (balas, player) {
+    
+    game.stage.backgroundColor = '#ffffff';
+
+
+}
+
+   
+        
+this.render = function (){
+    game.debug.spriteBounds(barco);
+ 
+}
+        
+	}
+
+	// Os estados do jogo podem ser entendidos como "telas" ou "cenários"
+	// Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
+	// dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
+	// executar jogo.state.start("Nome da tela") a qualquer momento)
+	game.state.add("TelaInicial", TelaInicial);
+	game.state.start("TelaInicial");
+
+	//]]>
+	</script>
+</body>
+</html>
