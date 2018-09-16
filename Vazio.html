@@ -69,36 +69,47 @@
 		this.preload = function () {          
 			game.load.crossOrigin = "anonymous";
             
-            
-
-            game.load.spritesheet('player', 'Sprites/phaser-dude.png');
-            game.load.spritesheet('ship', 'Sprites/ship.png');
-            game.load.image('bullet', 'http://examples.phaser.io/assets/sprites/purple_ball.png');
-            game.load.spritesheet('explosão', 'Sprites/explosion.png',64,64);
+            game.load.image('ship', 'Sprites/ship.png');
+            game.load.image('missil1', 'Sprites/Missil_1.png');
+            game.load.image('missil2', 'Sprites/Missil_2.png');
+            game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
             
             //Sprites mapa
             game.load.image('waterP', 'Sprites/waterP.png');
             game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png');
             game.load.image('floDireita', 'Sprites/FlorestaDireita.png');
+            
+
 		}
         
             
-        
+        //Variaveis sprites
         var barco;
         var cursors;
-        var player;
         var balas;
         var bala;
         var atira;
         
+        //Variaveis background
         var fundo
         var FlorestaEsquerda;
         var FlorestaDireita;
         
+        //Variaveis mecanica bala
         var bulletTime = 0;
         var fireInterval = 200;
 		var timeUltimoTiro = 0;
         var nextFire = 0;
+        
+        var anim;
+        
+        //Variaveis texto
+        var textoDistancia = 0;
+        var textoMoedas = 0;
+        
+        //Variaveis distancia
+        var distancia = 0;
+        
         
 		this.create = function () {
             
@@ -112,52 +123,53 @@
         //Margem floresta
         FlorestaEsquerda = game.add.tileSprite(150,0,300,2000, 'floEsquerda');
         FlorestaDireita  = game.add.tileSprite(1130,900,300,2000, 'floDireita');
-                
+        
+        
+        
         game.physics.p2.enable([FlorestaDireita,FlorestaEsquerda]);
         FlorestaEsquerda.body.kinematic = true;
 	    FlorestaDireita.body.kinematic = true;    
         //FlorestaEsquerda.body.static = true;
 	    //FlorestaDireita.body.static = true;
 
+
+
         //Cria sprites
-        barco = game.add.sprite(640,700, 'ship');         
-        player = game.add.sprite(640,20, 'player');     
-           
-        //barco.animations.add("explodir", [0,1,2,3,4,5], 12, false);
-        
+        barco = game.add.sprite(640,700, 'ship');          
+
+            
         //adiciona fisica nas sprites
-	    game.physics.p2.enable([barco,player]);
+	    game.physics.p2.enable(barco);
         //Fixa a rotação do barco
-        barco.body.fixedRotation = true;
-        
-            
-        //barco.body.clearShapes();
-        //barco.body.loadPolygon('physicsData', 'ship');
-            
-        cursors = game.input.keyboard.createCursorKeys();       
+        barco.body.fixedRotation = true;    
             
         balas = game.add.group();  
         balas.enableBody = true;
-        balas.createMultiple(50, 'bullet');
-        
-        
-        
-         atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-            
+        balas.createMultiple(50, 'missil1');
 
+        
+        textoDistancia = game.add.text(10,10, 'Distance: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
+        textoMoedas = game.add.text(10,60, 'Moedas: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
+        
+        //TECLADO    
+        cursors = game.input.keyboard.createCursorKeys();    
+        atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+                  
+        //Loop para contar distancia
+        game.time.events.loop(125, contaDistancia, this); 
+            
         }
         
 
 
 		this.update = function () {
-        
-
-            
+                  
         barco.body.setZeroVelocity();
             
         if (cursors.left.isDown)
             {
     	       barco.body.moveLeft(400);
+
             }
         else if (cursors.right.isDown)
             {
@@ -184,34 +196,47 @@
 			}
         }
 
-        game.physics.arcade.overlap(balas, player, collisionHandler, null, this);
-        
         //Move o fundo
         fundo.tilePosition.y += 1.5;
         //Move florestas    
         FlorestaEsquerda.tilePosition.y += 1;
         FlorestaDireita.tilePosition.y += 1
-            
-		}
+        
+        //player.body.onBeginContact.add(blockHit, this);    
+        
+        }
+        
+ 
+function contaDistancia() {
 
+    distancia++;
 
+    textoDistancia.setText('Distancia: ' + distancia);
+
+}        
+        
 function fire() {
     
-    bala = game.add.sprite(barco.x,(barco.y - 66), 'bullet');
+    bala = game.add.sprite(barco.x,(barco.y - 66), 'missil1');
     
-    game.physics.p2.enable(bala, true);
+    game.physics.p2.enable(bala);
     bala.body.velocity.y = -650;
     bala.body.setCircle(8.5);
-    bala.body.collideWorldBounds = false;
-    
-
-}
-function collisionHandler (balas, player) {
-    
-    game.stage.backgroundColor = '#000000';
+    bala.outOfBoundsKill = true;
+    balas.checkWorldBounds =  false;
 
 
 }
+
+//function blockHit (body, bodyB, shapeA, shapeB, equation) {
+//    if (body)
+//    {
+//        bala.kill();
+//        player.kill();
+//    }
+//
+//}
+
 
    
         
@@ -220,8 +245,8 @@ this.render = function (){
  
 }
         
-	}
-
+	
+    }
 	// Os estados do jogo podem ser entendidos como "telas" ou "cenários"
 	// Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
 	// dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
