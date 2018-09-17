@@ -16,7 +16,6 @@
 			color: #fff;
 			font: normal 14px sans-serif;
 		}
-
 		canvas {
 			display: block;
 			margin: 0 auto;
@@ -69,14 +68,14 @@
 		this.preload = function () {          
 			game.load.crossOrigin = "anonymous";
             
-            game.load.image('ship', 'Sprites/ship.png');
+            game.load.image('ship', 'Sprites/canoe_SW.png');
             game.load.image('missil1', 'Sprites/cannon_ball.png');
             game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
             
             //Sprites mapa
-            game.load.image('waterP', 'Sprites/waterP.png');
-            game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
-            game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
+            game.load.image('waterP', 'Sprites/rio.png');
+            //game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
+            //game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
             game.load.spritesheet('coin', 'Sprites/coin.png',32,32);
             
 
@@ -120,16 +119,20 @@
 
         
         //fundo
-        fundo = game.add.tileSprite(0,0,1280,3000, 'waterP'); 
-        
+        fundo = game.add.tileSprite(640,360,1280,720, 'waterP');
+        fundo.anchor.setTo(0.5,0.5);
+        fundo.angle = -37.5;
+        fundo.scale.setTo(1.5,1.5);
             
         paredes = game.add.group();
         game.physics.arcade.enable(paredes);
         paredes.enableBody = true;   
         paredes.setAll("body.immovable", true);
             
-        paredeE = paredes.create(0,-1280, 'floEsquerda');
-        paredeD = paredes.create(980,-1280, 'floDireita'); 
+        paredeE = paredes.create(1400,-700, 'floEsquerda');
+        paredeE.angle = 55;
+        paredeD = paredes.create(1500,0, 'floDireita');
+        paredeD.angle = 55;
             
         paredeE.body.immovable = true;
         paredeD.body.immovable = true;
@@ -168,7 +171,7 @@
         //Loop para contar distancia
         game.time.events.loop(100, contaDistancia, this); 
         
-        criaMoedas();
+        
         }
         
 
@@ -182,24 +185,29 @@
         
         barco.body.velocity.setTo(0, 0);
             
-        if (cursors.left.isDown)
+        if (cursors.right.isDown)
             {
     	       barco.body.velocity.x = -400;
+               barco.body.velocity.y = -333;
 
             }
-        else if (cursors.right.isDown)
+        else if (cursors.left.isDown)
             {
     	       barco.body.velocity.x = 400;
+                barco.body.velocity.y = 333;
             }
 
         if (cursors.up.isDown)
             {
-    	       barco.body.velocity.y = -400;
+    	       barco.body.velocity.x = 400;
+               barco.body.velocity.y = -333;
             }
         else if (cursors.down.isDown)
             {
-    	       barco.body.velocity.y = 400;
+    	       barco.body.velocity.x = -400;
+               barco.body.velocity.y = 333;
             }
+
         
         //Clicar para atirar
         if (atira.isDown)
@@ -213,7 +221,8 @@
         }
 
         //Move o fundo
-        fundo.tilePosition.y += 1.5;
+        fundo.tilePosition.x += -1;
+
         //Move florestas    
 
         
@@ -254,10 +263,13 @@ function fire() {
         if (bala)
         {
             //  And fire it
-            bala.reset(barco.x + 33, barco.y + -2);
-            bala.body.velocity.y = -800;
+            bala.reset(barco.x + 87, barco.y);
+            bala.body.velocity.x = 400;
+            bala.body.velocity.y = -333;
             bulletTime = game.time.now + 200;
             bala.scale.setTo(0.4,0.4);
+            
+            
         }
     }
     
