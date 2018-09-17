@@ -58,7 +58,7 @@
 
 				game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 				// Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
-				game.scale.setMinMax(400, 300, 800, 600);
+				game.scale.setMinMax(400, 300, 1280, 720);
 				game.scale.forceLandscape = true;
 				// Como criamos o CSS acima, não precisamos centralizar via código
 				game.scale.pageAlignHorizontally = false;
@@ -70,30 +70,28 @@
 			game.load.crossOrigin = "anonymous";
             
             game.load.image('ship', 'Sprites/ship.png');
-            game.load.image('missil1', 'Sprites/Missil_1.png');
-            game.load.image('missil2', 'Sprites/Missil_2.png');
+            game.load.image('missil1', 'Sprites/cannon_ball.png');
             game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
             
             //Sprites mapa
             game.load.image('waterP', 'Sprites/waterP.png');
-            game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png');
-            game.load.image('floDireita', 'Sprites/FlorestaDireita.png');
+            game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
+            game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
+            game.load.spritesheet('coin', 'Sprites/coin.png',32,32);
             
 
 		}
-        
             
         //Variaveis sprites
         var barco;
         var cursors;
-        var balas;
-        var bala;
         var atira;
         
         //Variaveis background
         var fundo
-        var FlorestaEsquerda;
-        var FlorestaDireita;
+        var paredes;
+        var paredeE;
+        var paredeD;
         
         //Variaveis mecanica bala
         var bulletTime = 0;
@@ -101,11 +99,15 @@
 		var timeUltimoTiro = 0;
         var nextFire = 0;
         
-        var anim;
+        var balas;
+        
+        var Moedas;
+
         
         //Variaveis texto
         var textoDistancia = 0;
         var textoMoedas = 0;
+        var textoPosition = 0;
         
         //Variaveis distancia
         var distancia = 0;
@@ -114,75 +116,89 @@
 		this.create = function () {
             
         game.stage.backgroundColor = "#3498db"; 
-        game.physics.startSystem(Phaser.Physics.P2JS);
+        game.physics.startSystem(Phaser.Physics.ARCADE);
 
         
         //fundo
         fundo = game.add.tileSprite(0,0,1280,3000, 'waterP'); 
         
-        //Margem floresta
-        FlorestaEsquerda = game.add.tileSprite(150,0,300,2000, 'floEsquerda');
-        FlorestaDireita  = game.add.tileSprite(1130,900,300,2000, 'floDireita');
-        
-        
-        
-        game.physics.p2.enable([FlorestaDireita,FlorestaEsquerda]);
-        FlorestaEsquerda.body.kinematic = true;
-	    FlorestaDireita.body.kinematic = true;    
-        //FlorestaEsquerda.body.static = true;
-	    //FlorestaDireita.body.static = true;
-
-
-
-        //Cria sprites
-        barco = game.add.sprite(640,700, 'ship');          
-
             
-        //adiciona fisica nas sprites
-	    game.physics.p2.enable(barco);
-        //Fixa a rotação do barco
-        barco.body.fixedRotation = true;    
+        paredes = game.add.group();
+        game.physics.arcade.enable(paredes);
+        paredes.enableBody = true;   
+        paredes.setAll("body.immovable", true);
             
-        balas = game.add.group();  
+        paredeE = paredes.create(0,-1280, 'floEsquerda');
+        paredeD = paredes.create(980,-1280, 'floDireita'); 
+            
+        paredeE.body.immovable = true;
+        paredeD.body.immovable = true;
+        
+            
+        Moedas = game.add.group();
+        Moedas.enableBody = true;
+        Moedas.physicsBodyType = Phaser.Physics.ARCADE;    
+            
+        //BARCO
+        barco = game.add.sprite(640,600, 'ship');          
+	    game.physics.arcade.enable(barco);
+        barco.body.fixedRotation = true;
+        barco.body.collideWorldBounds = false;
+        barco.body.enable = true;
+        
+        //Balas
+        balas = game.add.group();
         balas.enableBody = true;
-        balas.createMultiple(50, 'missil1');
-
+        balas.physicsBodyType = Phaser.Physics.ARCADE;
+        balas.createMultiple(30, 'missil1');
+        balas.setAll('anchor.x', 0.5);
+        balas.setAll('anchor.y', 0.5);
+        balas.setAll('outOfBoundsKill', true);
+        balas.setAll('checkWorldBounds', true);
         
+ 
         textoDistancia = game.add.text(10,10, 'Distance: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
         textoMoedas = game.add.text(10,60, 'Moedas: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
+        textoPosition = game.add.text(10,60, 'Posição: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
         
         //TECLADO    
         cursors = game.input.keyboard.createCursorKeys();    
         atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
                   
         //Loop para contar distancia
-        game.time.events.loop(125, contaDistancia, this); 
-            
+        game.time.events.loop(100, contaDistancia, this); 
+        
+        criaMoedas();
         }
         
 
-
 		this.update = function () {
-                  
-        barco.body.setZeroVelocity();
+            
+        
+        textoPosition.text = "Posição: X: " + paredes.x + "  Y: " + paredes.y; 
+            
+        game.physics.arcade.collide(barco, paredes);
+
+        
+        barco.body.velocity.setTo(0, 0);
             
         if (cursors.left.isDown)
             {
-    	       barco.body.moveLeft(400);
+    	       barco.body.velocity.x = -400;
 
             }
         else if (cursors.right.isDown)
             {
-    	       barco.body.moveRight(400);
+    	       barco.body.velocity.x = 400;
             }
 
         if (cursors.up.isDown)
             {
-    	       barco.body.moveUp(400);
+    	       barco.body.velocity.y = -400;
             }
         else if (cursors.down.isDown)
             {
-    	      barco.body.moveDown(400);
+    	       barco.body.velocity.y = 400;
             }
         
         //Clicar para atirar
@@ -199,9 +215,10 @@
         //Move o fundo
         fundo.tilePosition.y += 1.5;
         //Move florestas    
-        FlorestaEsquerda.tilePosition.y += 1;
-        FlorestaDireita.tilePosition.y += 1
+
         
+
+  
         //player.body.onBeginContact.add(blockHit, this);    
         
         }
@@ -213,19 +230,37 @@ function contaDistancia() {
 
     textoDistancia.setText('Distancia: ' + distancia);
 
-}        
+}
+
+function criaMoedas(){
+    
+    for(var y = 0; y < 30; y++){
+        
+        var moeda = Moedas.create(Math.random() * 1000,game.world.randomY, 'coin');
+        moeda.anchor.setTo(0.5, 0.5);
+        moeda.animations.add('animMoeda', [ 0, 1, 2, 3, 4 ,5], 12, true);
+        moeda.play('animMoeda');
+        moeda.body.moves = false;
+    }
+}
         
 function fire() {
-    
-    bala = game.add.sprite(barco.x,(barco.y - 66), 'missil1');
-    
-    game.physics.p2.enable(bala);
-    bala.body.velocity.y = -650;
-    bala.body.setCircle(8.5);
-    bala.outOfBoundsKill = true;
-    balas.checkWorldBounds =  false;
+        
+    if (game.time.now > bulletTime)
+    {
+        
+        var bala = balas.getFirstExists(false);
 
-
+        if (bala)
+        {
+            //  And fire it
+            bala.reset(barco.x + 33, barco.y + -2);
+            bala.body.velocity.y = -800;
+            bulletTime = game.time.now + 200;
+            bala.scale.setTo(0.4,0.4);
+        }
+    }
+    
 }
 
 //function blockHit (body, bodyB, shapeA, shapeB, equation) {
