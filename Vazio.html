@@ -68,14 +68,16 @@
 		this.preload = function () {          
 			game.load.crossOrigin = "anonymous";
             
-            game.load.image('ship', 'Sprites/canoe_SW.png');
+            game.load.image('ship', 'Sprites/pirate.png');
             game.load.image('missil1', 'Sprites/cannon_ball.png');
             game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
+
+            
             
             //Sprites mapa
-            game.load.image('waterP', 'Sprites/rio.png');
-            //game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
-            //game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
+            game.load.image('waterP', 'Sprites/Tileset_128.png');
+            game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
+            game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
             game.load.spritesheet('coin', 'Sprites/coin.png',32,32);
             
 
@@ -119,19 +121,17 @@
 
         
         //fundo
-        fundo = game.add.tileSprite(640,360,1280,720, 'waterP');
-        fundo.anchor.setTo(0.5,0.5);
-        fundo.scale.setTo(1,1.5);
+        fundo = game.add.tileSprite(0,0,1280,720, 'waterP');
+
             
         paredes = game.add.group();
         game.physics.arcade.enable(paredes);
         paredes.enableBody = true;   
         paredes.setAll("body.immovable", true);
             
-        paredeE = paredes.create(1400,-700, 'floEsquerda');
-        paredeE.angle = 55;
-        paredeD = paredes.create(1500,0, 'floDireita');
-        paredeD.angle = 55;
+        paredeE = paredes.create(0,-1280, 'floEsquerda');
+        paredeD = paredes.create(980,-1280, 'floDireita');
+
             
         paredeE.body.immovable = true;
         paredeD.body.immovable = true;
@@ -142,12 +142,12 @@
         Moedas.physicsBodyType = Phaser.Physics.ARCADE;    
             
         //BARCO
-        barco = game.add.sprite(640,600, 'ship');          
+        barco = game.add.sprite(0,0, 'ship');          
 	    game.physics.arcade.enable(barco);
         barco.body.fixedRotation = true;
         barco.body.collideWorldBounds = false;
         barco.body.enable = true;
-        barco.angle = 25;
+        barco.scale.setTo(0.4,0.4);    
             
         //Balas
         balas = game.add.group();
@@ -221,7 +221,7 @@
         }
 
         //Move o fundo
-        fundo.tilePosition.x += -1;
+        fundo.tilePosition.y += 0.7;
 
         //Move florestas    
 
@@ -264,8 +264,7 @@ function fire() {
         {
             //  And fire it
             bala.reset(barco.x + 87, barco.y);
-            bala.body.velocity.x = 400;
-            bala.body.velocity.y = -333;
+            bala.body.velocity.x = 800;
             bulletTime = game.time.now + 200;
             bala.scale.setTo(0.4,0.4);
             
