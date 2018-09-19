@@ -35,7 +35,7 @@
 	// Essa não é a forma mais "prosissional" de fazer, mas é a mais simples :)
 
 	// Vamos chamar a variável de game, para ficar igual ao sandbox!
-	var game = new Phaser.Game(1280, 720, Phaser.AUTO, "divJogo");
+	var game = new Phaser.Game(1280,720, Phaser.AUTO, "divJogo");
 
 	function TelaInicial(game) {
 
@@ -71,11 +71,11 @@
             game.load.image('ship', 'Sprites/ship.png');
             game.load.image('missil1', 'Sprites/cannon_ball.png');
             game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
-            game.load.image('inimigo', 'Sprites/inimigo.png');
+            game.load.image('inimigo', 'Sprites/rock.png');
             game.load.image('coracao', 'Sprites/heart.png');
             
             //Sprites mapa
-            game.load.spritesheet('waterP', 'Sprites/32_Tileset.jpg',32,32);
+            game.load.spritesheet('waterP', 'Sprites/Tileset.jpg',16,16);
             game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda.png',300,2000);
             game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
             game.load.spritesheet('coin', 'Sprites/coin.png',32,32);
@@ -102,7 +102,6 @@
         var nextFire = 0;
         
         var balas;
-        
         var Moedas;
         
         var explosoes;
@@ -115,6 +114,8 @@
 
         var textoFim = 0;
         
+        var loopIni;
+        var loopDist;
         //Variaveis distancia
         var distancia = 0;
         
@@ -122,6 +123,8 @@
         var coracao2;
         var coracao3;
         var vidas = 3;
+        
+        var liberaAtirar = true;
         
 		this.create = function () {
             
@@ -131,12 +134,14 @@
         
         //AGUA
 
-        for (var y = 0; y < 23; y++)
+        for (var y = 0; y < 47; y++)
         {
-            for (var x = 0; x < 31; x++)
+            for (var x = 0; x < 66; x++)
             {
-                fundo = game.add.sprite(x * 32,y * 32, 'waterP');
-                fundo.animations.add('moveAgua',[0,1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],32,true);
+                fundo = game.add.sprite(x * 16,y * 16, 'waterP');
+                
+                fundo.animations.add('moveAgua', [0,1,2,3,4,5,6,7,8,9,10], 6, true);
+                //fundo.animations.add('moveAgua',[0,1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31],32,true);
                 fundo.play('moveAgua');
 
             }
@@ -179,7 +184,7 @@
         inimigos = game.add.group();
         inimigos.enableBody = true;
         inimigos.physicsBodyType = Phaser.Physics.ARCADE;
-        inimigos.createMultiple(30, 'inimigo');
+        inimigos.createMultiple(100, 'inimigo');
         inimigos.setAll('anchor.x', 0.5);
         inimigos.setAll('anchor.y', 0.5);
         inimigos.setAll('outOfBoundsKill', true);
@@ -217,9 +222,10 @@
         atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
                   
         //Loop para contar distancia
-        game.time.events.loop(100, contaDistancia, this); 
-        game.time.events.loop(500, liberaInimigo, this);
-        
+        loopDist = game.time.events.loop(100, contaDistancia, this);
+            
+        loopIni = game.time.events.loop(1500, liberaInimigo, this);
+
 
             
             
@@ -261,22 +267,23 @@
 
         
         //Clicar para atirar
-        if (atira.isDown)
-        {
-			var agora = game.time.now;
-			var deltaT = agora - timeUltimoTiro;
-			if (deltaT >= fireInterval) {
+        if(liberaAtirar === true){
+            if (atira.isDown)
+            {
+			 var agora = game.time.now;
+			 var deltaT = agora - timeUltimoTiro;
+			 if (deltaT >= fireInterval) {
 				timeUltimoTiro = agora;
 				fire();
 			}
         }
-
+        }
         //Move o fundo
         
 
         //Move florestas    
-        florestaEsquerda.tilePosition.y += 0.6;
-        florestaDireita.tilePosition.y += 0.6;
+        florestaEsquerda.tilePosition.y += 1;
+        florestaDireita.tilePosition.y += 1;
 
   
         //barco.body.onBeginContact.add(blockHit, this);    
@@ -300,7 +307,8 @@ function liberaInimigo(){
         inimigo = inimigos.create(Math.random() * (980 - 300) + 300,-20, 'inimigo');
         inimigo.physicsBodyType = Phaser.Physics.ARCADE;
         inimigo.body.enable = true;
-        inimigo.body.velocity.y = 400;
+        inimigo.body.velocity.y = 150;
+        inimigo.scale.setTo(0.05,0.05);
         
     
 }
@@ -330,13 +338,16 @@ function collisionHandler(barco,inimigo){
     if (vidas.countLiving() < 1)
     {
         barco.kill();
-        inimigos.setAll('kill',true);
+        inimigos.callAll('kill');
+        liberaAtirar = false;
+        game.time.events.remove(loopIni);
+        game.time.events.remove(loopDist);
+        
         
         textoFim.text="      GAME OVER \n Clique para reiniciar";
         textoFim.visible = true;
-
-        //the "click to restart" handler
-        //game.input.onTap.addOnce(restart,this);
+       
+        game.input.onTap.addOnce(restart,this);
     }
     var explosao = explosoes.getFirstExists(false);
     explosao.reset(barco.body.x, barco.body.y);
@@ -365,6 +376,26 @@ function fire() {
     }
     
 }
+        
+function restart () {
+
+
+    
+    //resets the life count
+    vidas.callAll('revive');
+    //  And brings the aliens back from the dead :)
+    game.events
+    balas.callAll('revive');
+    //revives the player
+    barco.revive();
+    //hides the text
+    textoFim.visible = false;
+    liberaAtirar == true;
+    distancia = 0;
+    loopIni = game.time.events.loop(1500, liberaInimigo, this);
+    loopDist = game.time.events.loop(100, contaDistancia, this);
+    barco.reset(640, 680);
+}
 
 //function blockHit (body, bodyB, shapeA, shapeB, equation) {
 //    if (body)
@@ -383,8 +414,8 @@ this.render = function (){
  
 }
         
-	
-    }
+        
+        }
 	// Os estados do jogo podem ser entendidos como "telas" ou "cenários"
 	// Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
 	// dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
