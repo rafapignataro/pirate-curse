@@ -116,6 +116,7 @@
         
         var loopIni;
         var loopDist;
+        var loopMoe;
         //Variaveis distancia
         var distancia = 0;
         
@@ -150,7 +151,7 @@
             
         //FLORESTA
         florestaEsquerda = game.add.tileSprite(0,0,300,2000, 'floEsquerda'); 
-        florestaDireita = game.add.tileSprite(980,0,300,2000, 'floDireita');
+        florestaDireita = game.add.tileSprite(980,-700,300,2000, 'floDireita');
         game.physics.arcade.enable([florestaDireita,florestaEsquerda]);
         florestaEsquerda.body.enable = true;
         florestaDireita.body.enable = true;
@@ -222,11 +223,11 @@
         atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
                   
         //Loop para contar distancia
-        loopDist = game.time.events.loop(100, contaDistancia, this);
+        loopDist = game.time.events.loop(90, contaDistancia, this);
             
-        loopIni = game.time.events.loop(1500, liberaInimigo, this);
+        loopIni = game.time.events.loop(700, liberaInimigo, this);
 
-
+        loopMoe = game.time.events.loop(5000, criaMoedas, this);    
             
             
         
@@ -282,8 +283,8 @@
         
 
         //Move florestas    
-        florestaEsquerda.tilePosition.y += 1;
-        florestaDireita.tilePosition.y += 1;
+        florestaEsquerda.tilePosition.y += 2;
+        florestaDireita.tilePosition.y += 2;
 
   
         //barco.body.onBeginContact.add(blockHit, this);    
@@ -304,10 +305,10 @@ function contaDistancia() {
 
 function liberaInimigo(){
     
-        inimigo = inimigos.create(Math.random() * (980 - 300) + 300,-20, 'inimigo');
+        inimigo = inimigos.create(Math.random() * (971 - 309) + 309,-20, 'inimigo');
         inimigo.physicsBodyType = Phaser.Physics.ARCADE;
         inimigo.body.enable = true;
-        inimigo.body.velocity.y = 150;
+        inimigo.body.velocity.y = 100;
         inimigo.scale.setTo(0.05,0.05);
         
     
@@ -315,14 +316,17 @@ function liberaInimigo(){
 
 function criaMoedas(){
     
-    for(var y = 0; y < 30; y++){
+    
         
-        var moeda = Moedas.create(Math.random() * 1000,game.world.randomY, 'coin');
-        moeda.anchor.setTo(0.5, 0.5);
+        var moeda = Moedas.create(Math.random() * (960 - 310) + 310,-20, 'coin');
+        moeda.anchor.setTo(0.25, 0.25);
         moeda.animations.add('animMoeda', [ 0, 1, 2, 3, 4 ,5], 12, true);
         moeda.play('animMoeda');
-        moeda.body.moves = false;
-    }
+        
+        moeda.physicsBodyType = Phaser.Physics.ARCADE;
+        moeda.body.enable = true;
+        moeda.body.velocity.y = 200;
+    
 }
 function collisionHandler(barco,inimigo){
     
