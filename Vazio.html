@@ -68,7 +68,7 @@
 		this.preload = function () {
 			game.load.crossOrigin = "anonymous";
 
-            game.load.image('ship', 'Sprites/Fragata.png');
+            game.load.image('ship', 'Sprites/Fragatinha.png');
 						game.load.image('barcoinimigo', 'Sprites/ship2.png')
             game.load.image('missil1', 'Sprites/cannon_ball.png');
 						game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
@@ -161,12 +161,12 @@
 
         //BARCO
         barco = game.add.sprite(640,600, 'ship');
-	    	game.physics.arcade.enable(barco);
+	    game.physics.arcade.enable(barco);
         barco.body.fixedRotation = true;
         barco.body.collideWorldBounds = true;
         barco.body.enable = true;
         barco.anchor.setTo(0.5,0.5);
-        barco.scale.setTo(0.08);
+        
 
         //Balas
         balas = game.add.group();
