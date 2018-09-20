@@ -263,6 +263,7 @@
         game.physics.arcade.overlap(barco, inimigos, collisionHandler, null, this);
 				game.physics.arcade.overlap(barco, barcoInimigo, collisionHandler, null, this);
 				game.physics.arcade.overlap(barco, balaInimiga, collisionHandler, null, this);
+				game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
 
         barco.body.velocity.setTo(0, 0);
 
@@ -390,9 +391,20 @@ function collisionHandler(barco,inimigo,barcoinimigo){
     explosao.reset(barco.body.x, barco.body.y);
     explosao.animations.add('explode');
     explosao.play('explode', 180,false, true);
+}
+
+function collisionHandler2(bala, barcoinimigo) {
+		bala.kill();
+		barcoinimigo.kill();
+
+		var explosao = explosoes.getFirstExists(false);
+    explosao.reset(barcoinimigo.body.x, barcoinimigo.body.y);
+    explosao.animations.add('explode');
+    explosao.play('explode', 180,false, true);
 
 
 }
+
 function fire() {
 
     if (game.time.now > bulletTime)
