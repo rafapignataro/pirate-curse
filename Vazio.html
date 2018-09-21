@@ -367,7 +367,7 @@ function collisionHandler(barco,pedra,barcoinimigo){
         game.time.events.remove(loopBarIni);
         game.time.events.remove(loopDist);
 
-        textoFim.text="      Você percorreu: \n" + distancia + " Metros";
+        textoFim.text="  Você percorreu: \n"+ "      " +  distancia + " Metros";
         textoFim.visible = true;
 
         game.input.onTap.addOnce(restart,this);
