@@ -38,7 +38,7 @@
         // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
 
         // Vamos chamar a variável de game, para ficar igual ao sandbox!
-        var game = new Phaser.Game(1280, 720, Phaser.AUTO, "divJogo");
+        var game = new Phaser.Game(1280, 720, Phaser.CANVAS, "divJogo");
 
         function TelaInicial(game) {
 
@@ -191,13 +191,13 @@
                 //PEDRAS
                 pedras = game.add.group();
                 pedras.enableBody = true;
-                pedras.physicsBodyType = Phaser.Physics.ARCADE;
+                game.physics.arcade.enable(pedras,true);
                 pedras.createMultiple(100, 'pedra');
                 pedras.setAll('anchor.x', 0.5);
                 pedras.setAll('anchor.y', 0.5);
                 pedras.setAll('outOfBoundsKill', true);
                 pedras.setAll('checkWorldBounds', true);
-
+                
 
                 //CORAÇÕES
                 vidas = game.add.group();
@@ -354,7 +354,10 @@
                 pedra.physicsBodyType = Phaser.Physics.ARCADE;
                 pedra.body.enable = true;
                 pedra.body.velocity.y = 120;
+                pedra.body.setSize(250, 250, 125, 125);
                 pedra.scale.setTo(0.25, 0.25);
+                pedra.body.setCircle(32.5);
+                
 
                 //var estaSobreAlguem;
                 //do {
@@ -483,6 +486,7 @@
 
             this.render = function() {
                 //game.debug.spriteBounds(barco);
+                game.debug.body(pedras);
             }
 
 
