@@ -77,7 +77,7 @@
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
                 game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
                 game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
-                game.load.image('pedra', 'Sprites/rock.png');
+                game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('coracao', 'Sprites/heart.png');
 
                 //Sprites mapa
@@ -350,11 +350,11 @@
             }
 
             function liberaPedras() {
-                pedra = pedras.create(Math.random() * (0 - 1280) + 1280, -20, 'pedra');
+                pedra = pedras.create(Math.random() * (0 - 1280) + 1280, -100, 'pedra');
                 pedra.physicsBodyType = Phaser.Physics.ARCADE;
                 pedra.body.enable = true;
                 pedra.body.velocity.y = 120;
-                pedra.scale.setTo(0.05, 0.05);
+                pedra.scale.setTo(0.25, 0.25);
 
                 //var estaSobreAlguem;
                 //do {
@@ -520,18 +520,7 @@
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
 
-                game.load.image('ship', 'Sprites/Fragatinha.png');
-                game.load.image('barcoinimigo', 'Sprites/ship2.png')
-                game.load.image('missil1', 'Sprites/cannon_ball.png');
-                game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
-                game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
-                game.load.image('pedra', 'Sprites/rock.png');
-                game.load.image('coracao', 'Sprites/heart.png');
                 game.load.image('tela','Sprites/srcoutoo.jpg',1280,720);
-                //Sprites mapa
-                game.load.spritesheet('waterP', 'Sprites/marloop.jpg', 1280, 1440);
-                game.load.spritesheet('coin', 'Sprites/coin.png', 32, 32);
-
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.spritesheet('btnPlay', 'Sprites/play.jpg');
                 game.load.spritesheet('btnPlayOver', 'Sprites/playOver.jpg');
