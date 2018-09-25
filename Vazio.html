@@ -218,7 +218,7 @@
                     backgroundColor: "#34495e",
                     padding: "20px"
                 });
-                textoInimigos = game.add.text(10, 60, 'Inimigos: ', {
+                textoInimigos = game.add.text(10, 60, 'Inimigos: 0', {
                     font: "40px arial",
                     fill: "#ffffff",
                     backgroundColor: "#34495e",
@@ -323,7 +323,7 @@
             function contaInimigos() {
 
                 InimigosMortos++;
-                textoInimigos.setText('Inimigos:' + InimigosMortos);
+                textoInimigos.setText('Inimigos: ' + InimigosMortos);
             }
 
 
@@ -465,13 +465,15 @@
                 //resets the life count
                 vidas.callAll('revive');
                 //  And brings the aliens back from the dead :)
-                game.events
+                
                 liberaAtirar = true;
-                //revives the player
+                //Revive o barco
                 barco.revive();
-                //hides the text
+                //esconde o texto
                 textoFim.visible = false;
                 distancia = 0;
+                InimigosMortos = 0;
+                textoInimigos.text = "Inimigos: " + 0;
                 loopPedras = game.time.events.loop(2000, liberaPedras, this);
                 loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
                 loopDist = game.time.events.loop(100, contaDistancia, this);
@@ -600,26 +602,6 @@
 
             this.update = function() {
 
-            }
-
-
-
-
-            function restart() {
-                //resets the life count
-                vidas.callAll('revive');
-                //  And brings the aliens back from the dead :)
-                game.events
-                liberaAtirar = true;
-                //revives the player
-                barco.revive();
-                //hides the text
-                textoFim.visible = false;
-                distancia = 0;
-                loopPedras = game.time.events.loop(2000, liberaPedras, this);
-                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-                loopDist = game.time.events.loop(100, contaDistancia, this);
-                barco.reset(640, 680);
             }
 
 
