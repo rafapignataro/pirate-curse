@@ -81,9 +81,9 @@
                 game.load.image('coracao', 'Sprites/heart.png');
 
                 //Sprites mapa
-                game.load.spritesheet('waterP', 'Sprites/marloop.jpg', 1280, 1440);
+                game.load.spritesheet('waterP', 'Sprites/marLoop.jpg', 1280, 1440);
                 game.load.spritesheet('coin', 'Sprites/coin.png', 32, 32);
-                game.load.spritesheet('ilha', 'Sprites/ilha.png',1280,1440);
+                game.load.spritesheet('ilha', 'Sprites/ilhazinha.png',1280,1440);
 
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
 
@@ -304,12 +304,10 @@
 
 
                 //Move o fundo
-
-
                 fundo.tilePosition.y += 2;
                 ilha.tilePosition.y += 2;
+                
 
-                //barco.body.onBeginContact.add(blockHit, this);
 
             }
 
@@ -397,7 +395,7 @@
                     game.time.events.remove(loopBarIni);
                     game.time.events.remove(loopDist);
 
-                    textoFim.text = "  Você percorreu: \n" + "      " + distancia + " Metros";
+                    textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
                     textoFim.visible = true;
                     game.input.onTap.addOnce(restart, this);
                 }
