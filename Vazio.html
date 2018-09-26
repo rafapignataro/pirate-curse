@@ -83,6 +83,7 @@
                 //Sprites mapa
                 game.load.spritesheet('waterP', 'Sprites/marloop.jpg', 1280, 1440);
                 game.load.spritesheet('coin', 'Sprites/coin.png', 32, 32);
+                game.load.spritesheet('ilha', 'Sprites/ilha.png',1280,1440);
 
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
 
@@ -96,7 +97,7 @@
 
             //Variaveis background
             var fundo;
-
+            var ilha;
 
 
             //Variaveis mecanica bala
@@ -148,6 +149,7 @@
                 //AGUA
 
                 fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
+                ilha = game.add.tileSprite(0,0,1280,1440,'ilha');
 
                 //BARCO
                 barco = game.add.sprite(640, 600, 'ship');
@@ -305,7 +307,7 @@
 
 
                 fundo.tilePosition.y += 2;
-
+                ilha.tilePosition.y += 2;
 
                 //barco.body.onBeginContact.add(blockHit, this);
 
@@ -328,7 +330,7 @@
 
 
             function liberaBarcoInimigo() {
-                var barcoinimigo = barcoInimigo.create(Math.random() * (0 - 1280) + 1280, -50, 'barcoinimigo');
+                var barcoinimigo = barcoInimigo.create(Math.random() * (980 - 300) + 300, -50, 'barcoinimigo');
 
                 barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
                 barcoinimigo.body.enable = true;
@@ -350,7 +352,7 @@
             }
 
             function liberaPedras() {
-                pedra = pedras.create(Math.random() * (0 - 1280) + 1280, -100, 'pedra');
+                pedra = pedras.create(Math.random() * (980 - 300) + 300, -100, 'pedra');
                 pedra.physicsBodyType = Phaser.Physics.ARCADE;
                 pedra.body.enable = true;
                 pedra.body.velocity.y = 120;
