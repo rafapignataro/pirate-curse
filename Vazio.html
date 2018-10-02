@@ -208,13 +208,10 @@
                 //Barcos inimigos
                 barcoInimigo = game.add.group();
                 barcoInimigo.enableBody = true;
-                barcoInimigo.physicsBodyType = Phaser.Physics.ARCADE;
                 barcoInimigo.createMultiple(15, 'barcoinimigo');
-                //barcoInimigo.setAll('anchor.x', 0.5);
-                //barcoInimigo.setAll('anchor.y', 0.5);
-                //barcoInimigo.setAll('outOfBoundsKill', true);
-                //barcoInimigo.setAll('checkWorldBounds', true);
-
+                barcoInimigo.physicsBodyType = Phaser.Physics.ARCADE;
+                
+                
                 //Balas Inimigas
                 balasInimigas = game.add.group();
                 balasInimigas.enableBody = true;
@@ -225,8 +222,6 @@
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
 
-                //game.world.sendToBack(pedras);
-                //game.world.sendToBack(fundo);
                 
                 //CORAÇÕES
                 vidas = game.add.group();
@@ -284,6 +279,14 @@
                     if (lista[i].body.y > 300) {
                         lista[i].outOfBoundsKill = true;
                         lista[i].checkWorldBounds = true;
+                    }
+                }
+                
+                var lista2 = barcoInimigo.getAll('exists', true);
+                for (var i = 0; i < lista2.length; i++) {
+                    if (lista2[i].body.y > 300) {
+                        lista2[i].outOfBoundsKill = true;
+                        lista2[i].checkWorldBounds = true;
                     }
                 }
 
@@ -362,28 +365,26 @@
 
 
             function liberaBarcoInimigo() {
-                var barcoinimigo = barcoInimigo.create(Math.random() * (980 - 300) + 300, -50, 'barcoinimigo');
-
+                
+                var barcoinimigo = barcoInimigo.getRandomNotExists();
+                            
+                if(!barcoinimigo){
+                    barcoinimigo = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'barcoinimigo');
+                    barcoinimigo.outOfBoundsKill = false;
+                    barcoinimigo.checkWorldBounds = false;
+                } else {
+                    barcoinimigo.outOfBoundsKill = false;
+                    barcoinimigo.checkWorldBounds = false;
+                    barcoinimigo.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                }
                 barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
                 barcoinimigo.body.enable = true;
                 barcoinimigo.body.velocity.y = 180;
                 barcoinimigo.scale.setTo(0.5, 0.5);
-                //var estaSobreAlguem;
-                //do {
-                //    estaSobreAlguem = false;
-                //    barcoinimigo.body.position.x = Math.random() * (971 - 309) + 309;
-                //    game.physics.arcade.overlap(barcoinimigo, barcoInimigo, function (a, b) {
-                //        if (barcoinimigo !== b) {
-                //            estaSobreAlguem = true;
-                //        }
-                //    }, null, this);
-                //    game.physics.arcade.overlap(barcoinimigo, pedras, function () {
-                //        estaSobreAlguem = true;
-                //    }, null, this);
-                //} while (estaSobreAlguem);
             }
 
             function liberaPedras() {
+                
                 var pedra = pedras.getRandomNotExists();
                 if (!pedra) {
                     pedra = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'pedra');
