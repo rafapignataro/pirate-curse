@@ -1,515 +1,693 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br">
+
 <head>
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="viewport" content="width=800, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui, shrink-to-fit=no" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=800, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, minimal-ui, shrink-to-fit=no" />
 
-	<title>Meu Joguinho</title>
+    <title>Meu Joguinho</title>
 
-	<style type="text/css">
-		body {
-			background: #000;
-			padding: 0;
-			margin: 0;
-			color: #fff;
-			font: normal 14px sans-serif;
-		}
-		canvas {
-			display: block;
-			margin: 0 auto;
+    <style type="text/css">
+        body {
+            background: #000;
+            padding: 0;
+            margin: 0;
+            color: #fff;
+            font: normal 14px sans-serif;
+        }
 
-		}
-	</style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+
+        }
+    </style>
 </head>
+
 <body>
 
-	<div id="divJogo"></div>
+    <div id="divJogo"></div>
 
-	<script type="text/javascript" src="phaser.min.js"></script>
-	<script type="text/javascript">
-	    //<![CDATA[
-	    "use strict";
-	
-	    // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
-	
-	    // Vamos chamar a variável de game, para ficar igual ao sandbox!
-	    var game = new Phaser.Game(1280,720, Phaser.AUTO, "divJogo");
-	
-	    function TelaInicial(game) {
-	
-	        // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
-	        this.init = function () {
-	
-	            game.input.maxPointers = 1;
-	
-	            // Deixar o jogo executando, mesmo se o browser mudar de aba?
-	            game.stage.disableVisibilityChange = false;
-	
-	            if (game.device.desktop) {
-	// Configurações específicas para desktop
-	
-	// Como criamos o CSS acima, não precisamos centralizar via código
-	game.scale.pageAlignHorizontally = false;
-	            } else {
-	// Configurações específicas para celulares
-	
-	game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-	// Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
-	game.scale.setMinMax(400, 300, 1280, 720);
-	game.scale.forceLandscape = true;
-	// Como criamos o CSS acima, não precisamos centralizar via código
-	game.scale.pageAlignHorizontally = false;
-	            }
-	
-	        }
-	        
-	
-	        this.preload = function () {
-	            game.load.crossOrigin = "anonymous";
-	
-	            game.load.image('ship', 'Sprites/Fragatinha.png');
-	        game.load.image('barcoinimigo', 'Sprites/ship2.png')
-	            game.load.image('missil1', 'Sprites/cannon_ball.png');
-	        game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
-	            game.load.spritesheet('explode', 'Sprites/explosion.png',64,64);
-	            game.load.image('pedra', 'Sprites/rock.png');
-	            game.load.image('coracao', 'Sprites/heart.png');
-	
-	            //Sprites mapa
-	            game.load.spritesheet('waterP', 'Sprites/marloop.jpg', 1280, 1440);
-	            game.load.image('floEsquerda', 'Sprites/FlorestaEsquerda1.png',300,2000);
-	            game.load.image('floDireita', 'Sprites/FlorestaDireita.png',300,2000);
-	            game.load.spritesheet('coin', 'Sprites/coin.png',32,32);
-	            
-	            game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
-	
-	        }
-	
-	        //Variaveis sprites
-	        var barco;
-	        var cursors;
-	        var atira;
-	        var barcoInimigo;
-	
-	        //Variaveis background
-	        var fundo;
-	        var florestaEsquerda;
-	        var florestaDireita;
-	
-	
-	        //Variaveis mecanica bala
-	        var bulletTime = 0;
-	        var fireInterval = 200;
-	var timeUltimoTiro = 0;
-	        var nextFire = 0;
-	
-	        var balas;
-	var balasInimigas;
-	        var InimigosMortos = 0;
-	
-	        var explosoes;
-	
-	        var pedras;
-	        var pedra;
-	
-	var inimigosVivos = [];
-	var firingTimer = 0;
-	//Variaveis texto
-	        var textoDistancia = 0;
-	        var textoInimigos = 0;
-	
-	        var textoFim = 0;
-	
-	        var loopPedras;
-	        var loopDist;
-	        var loopMoe;
-	var loopBarIni;
-	        //Variaveis distancia
-	        var distancia = 0;
-	
-	        var coracao;
-	        var coracao2;
-	        var coracao3;
-	        var vidas = 3;
+    <script type="text/javascript" src="phaser.min.js"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+        "use strict";
+
+        // https://github.com/photonstorm/phaser/blob/v2.6.2/src/core/Group.js#L2372
+        Phaser.Group.prototype.getRandomNotExists = function (startIndex, endIndex) {
+            var list = this.getAll('exists', false, startIndex, endIndex);
+            return this.game.rnd.pick(list);
+        };
+
+        
+        // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
+
+        // Vamos chamar a variável de game, para ficar igual ao sandbox!
+        var game = new Phaser.Game(1280, 720, Phaser.CANVAS, "divJogo");
+
+        function TelaInicial(game) {
+
+            // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
+            this.init = function() {
+
+                game.input.maxPointers = 1;
+
+                // Deixar o jogo executando, mesmo se o browser mudar de aba?
+                game.stage.disableVisibilityChange = false;
+
+                if (game.device.desktop) {
+                    // Configurações específicas para desktop
+
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                } else {
+                    // Configurações específicas para celulares
+
+                    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                    // Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
+                    game.scale.setMinMax(400, 300, 1280, 720);
+                    game.scale.forceLandscape = true;
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                }
+
+            }
+
+
+            this.preload = function() {
+                game.load.crossOrigin = "anonymous";
+
+                game.load.image('ship', 'Sprites/Fragatinha.png');
+                game.load.image('barcoinimigo', 'Sprites/ship2.png')
+                game.load.image('missil1', 'Sprites/cannon_ball.png');
+                game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
+                game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
+                game.load.image('coracao', 'Sprites/heart.png');
+                
+                game.load.image('pedra', 'Sprites/pedra1.png');
+
+                //Sprites mapa
+                game.load.spritesheet('waterP', 'Sprites/marLoop.jpg', 1280, 1440);
+                game.load.spritesheet('ilha', 'Sprites/ilhazinha.png',1280,1440);
+                game.load.image('parede', 'Sprites/Colisor.png');
+                
+                game.load.image('pedra', 'Sprites/pedra1.png');
+                game.load.image('pedra2', 'Sprites/pedra2.png');
+                game.load.image('pedra3', 'Sprites/pedra3.png');
+                
+                game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
+
+            }
+
+            //Variaveis sprites
+            var barco;
+            var cursors;
+            var atira;
+            var barcoInimigo;
+
+            //Variaveis background
+            var fundo;
+            var ilha;
+            
+            var parede;
+            var parede2;
+
+
+            //Variaveis mecanica bala
+            var bulletTime = 0;
+            var fireInterval = 200;
+            var timeUltimoTiro = 0;
+            var nextFire = 0;
+
+            var balas;
+            var balasInimigas;
+            var InimigosMortos = 0;
+
+            var explosoes;
+
+            var pedras;
+
+            var inimigosVivos = [];
+            var firingTimer = 0;
+            
+            //Variaveis texto
+            var textoDistancia = 0;
+            var textoInimigos = 0;
+
+            var textoFim = 0;
+
+            //Loopings
+            var loopPedras;
+            var loopDist;
+            var loopMoe;
+            var loopBarIni;
+            //Variaveis distancia
+            var distancia = 0;
+
+            var coracao;
+            var coracao2;
+            var coracao3;
+            var vidas = 3;
             var tipoVerificacao = 0;
-	
-	        var liberaAtirar = true;
-	
-	        this.create = function () {
-	        
-	
-	        game.stage.backgroundColor = "#3498db";
-	        game.physics.startSystem(Phaser.Physics.ARCADE);
-	
-	        //AGUA
-	
-	        fundo = game.add.tileSprite(0,0,1280,1440, 'waterP');
-	            
-	        
-	        //FLORESTA
-	        florestaEsquerda = game.add.tileSprite(0,0,300,2000, 'floEsquerda');
-	        florestaDireita = game.add.tileSprite(980,-700,300,2000, 'floDireita');
-	        game.physics.arcade.enable([florestaDireita,florestaEsquerda]);
-	        florestaEsquerda.body.enable = true;
-	        florestaDireita.body.enable = true;
-	        florestaDireita.body.immovable = true;
-	        florestaEsquerda.body.immovable = true;
-	
-	        //BARCO
-	        barco = game.add.sprite(640,600, 'ship');
-	        game.physics.arcade.enable(barco);
-	        barco.body.fixedRotation = true;
-	        barco.body.collideWorldBounds = true;
-	        barco.body.enable = true;
-	        barco.anchor.setTo(0.5,0.5);
-	        
-	
-	        //Balas
-	        balas = game.add.group();
-	        balas.enableBody = true;
-	        balas.physicsBodyType = Phaser.Physics.ARCADE;
-	        balas.createMultiple(30, 'missil1');
-	        balas.setAll('anchor.x', 0.5);
-	        balas.setAll('anchor.y', 0.5);
-	        balas.setAll('outOfBoundsKill', true);
-	        balas.setAll('checkWorldBounds', true);
-	
-	//Balas Inimigas
-	balasInimigas = game.add.group();
-	        balasInimigas.enableBody = true;
-	        balasInimigas.physicsBodyType = Phaser.Physics.ARCADE;
-	        balasInimigas.createMultiple(30, 'balaInimiga');
-	        balasInimigas.setAll('anchor.x', 0.5);
-	        balasInimigas.setAll('anchor.y', 0.5);
-	        balasInimigas.setAll('outOfBoundsKill', true);
-	        balasInimigas.setAll('checkWorldBounds', true);
-	
-	//Barcos inimigos
-	barcoInimigo = game.add.group();
-	barcoInimigo.enableBody = true;
-	barcoInimigo.physicsBodyType = Phaser.Physics.ARCADE;
-	barcoInimigo.createMultiple(100, 'barcoinimigo');
-	barcoInimigo.setAll('anchor.x', 0.5);
-	barcoInimigo.setAll('anchor.y', 0.5);
-	barcoInimigo.setAll('outOfBoundsKill', true);
-	barcoInimigo.setAll('checkWorldBounds', true);
-	
-	        //PEDRAS
-	        pedras = game.add.group();
-	        pedras.enableBody = true;
-	        pedras.physicsBodyType = Phaser.Physics.ARCADE;
-	        pedras.createMultiple(100, 'pedra');
-	        pedras.setAll('anchor.x', 0.5);
-	        pedras.setAll('anchor.y', 0.5);
-	        pedras.setAll('outOfBoundsKill', true);
-	        pedras.setAll('checkWorldBounds', true);
-	
-	
-	         //CORAÇÕES
-	        vidas = game.add.group();
-	        for (var i = 0; i < 3; i++)
-	        {
-	            var coracao = vidas.create(game.world.width - 155 + (60 * i), 40, 'coracao');
-	            coracao.anchor.setTo(0.5, 0.5);
-	            coracao.scale.setTo(0.06,0.06);
-	        }
-	
-	
-	        //EXPLOSÕES
-	        explosoes = game.add.group();
-	        explosoes.createMultiple(30, 'explode');
-	
-	        textoDistancia = game.add.text(10,10, 'Distance: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
-	        textoInimigos = game.add.text(10,60, 'Inimigos: ',{font: "40px arial", fill: "#ffffff", backgroundColor: "#34495e" , padding: "20px"});
-	
-	
-	        textoFim = game.add.text(game.world.centerX,game.world.centerY,' ', { font: '84px Arial', fill: '#fff'});
-	        textoFim.anchor.setTo(0.5, 0.5);
-	        textoFim.visible = false;
-	
-	
-	        //TECLADO
-	        cursors = game.input.keyboard.createCursorKeys();
-	        atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-	
-	        //Loop para contar distancia
-	        loopDist = game.time.events.loop(90, contaDistancia, this);
-	
-	        loopPedras = game.time.events.loop(700, liberaPedras, this);
-	
-	loopBarIni = game.time.events.loop(700, liberaBarcoInimigo, this);
-	
-	        
-	
-	        }
-	
-	
-	        this.update = function () {
-	            
-	        
-	            
-	            game.physics.arcade.collide(barco, [florestaDireita,florestaEsquerda]);
+
+            var liberaAtirar = true;
+
+            this.create = function() {
+
+
+                game.stage.backgroundColor = "#3498db";
+                game.physics.startSystem(Phaser.Physics.ARCADE);
+
+                //AGUA
+
+                fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
+                ilha = game.add.tileSprite(0,0,1280,1440,'ilha');
+
+                //PEDRAS
+                pedras = game.add.group();
+                pedras.enableBody = true;
+                pedras.createMultiple(5, 'pedra');
+                pedras.createMultiple(5, 'pedra2');
+                pedras.createMultiple(5, 'pedra3');
+                game.physics.arcade.enable(pedras, true);
+                
+                //Parede invisivel laterais
+                parede = game.add.sprite(0,0, 'parede');
+                parede2 = game.add.sprite(980,0, 'parede');
+                game.physics.enable(parede, Phaser.Physics.ARCADE);
+                game.physics.enable(parede2, Phaser.Physics.ARCADE);
+                parede.body.enable = true;
+                parede2.body.enable = true;
+                parede.alpha = 0;
+                parede2.alpha = 0;
+                parede.body.collideWorldBounds = true;
+                parede2.body.collideWorldBounds = true;
+                parede.body.immovable = true
+                parede2.body.immovable = true;
+                
+                //BARCO
+                barco = game.add.sprite(640, 600, 'ship');
+                game.physics.arcade.enable(barco);
+                barco.body.fixedRotation = true;
+                barco.body.collideWorldBounds = true;
+                barco.body.enable = true;
+                barco.anchor.setTo(0.5, 0.5);
+
+                //Balas
+                balas = game.add.group();
+                balas.enableBody = true;
+                balas.physicsBodyType = Phaser.Physics.ARCADE;
+                balas.createMultiple(30, 'missil1');
+                balas.setAll('anchor.x', 0.5);
+                balas.setAll('anchor.y', 0.5);
+                balas.setAll('outOfBoundsKill', true);
+                balas.setAll('checkWorldBounds', true);
+
+                //Barcos inimigos
+                barcoInimigo = game.add.group();
+                barcoInimigo.enableBody = true;
+                barcoInimigo.createMultiple(15, 'barcoinimigo');
+                barcoInimigo.physicsBodyType = Phaser.Physics.ARCADE;
+                
+                
+                //Balas Inimigas
+                balasInimigas = game.add.group();
+                balasInimigas.enableBody = true;
+                balasInimigas.physicsBodyType = Phaser.Physics.ARCADE;
+                balasInimigas.createMultiple(30, 'balaInimiga');
+                balasInimigas.setAll('anchor.x', 0.5);
+                balasInimigas.setAll('anchor.y', 0.5);
+                balasInimigas.setAll('outOfBoundsKill', true);
+                balasInimigas.setAll('checkWorldBounds', true);
+
+                
+                //CORAÇÕES
+                vidas = game.add.group();
+                for (var i = 0; i < 3; i++) {
+                    var coracao = vidas.create(game.world.width - 155 + (60 * i), 40, 'coracao');
+                    coracao.anchor.setTo(0.5, 0.5);
+                    coracao.scale.setTo(0.06, 0.06);
+                }
+
+
+                //EXPLOSÕES
+                explosoes = game.add.group();
+                explosoes.createMultiple(30, 'explode');
+
+                textoDistancia = game.add.text(10, 10, 'Distance: ', {
+                    font: "40px arial",
+                    fill: "#ffffff",
+                    backgroundColor: "#34495e",
+                    padding: "20px"
+                });
+                textoInimigos = game.add.text(10, 60, 'Inimigos: 0', {
+                    font: "40px arial",
+                    fill: "#ffffff",
+                    backgroundColor: "#34495e",
+                    padding: "20px"
+                });
+
+
+                textoFim = game.add.text(game.world.centerX, game.world.centerY, ' ', {
+                    font: '84px Arial',
+                    fill: '#fff'
+                });
+                textoFim.anchor.setTo(0.5, 0.5);
+                textoFim.visible = false;
+
+
+                //TECLADO
+                cursors = game.input.keyboard.createCursorKeys();
+                atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
+                //Loop para contar distancia
+                loopDist = game.time.events.loop(90, contaDistancia, this);
+
+                loopPedras = game.time.events.loop(2000, liberaPedras, this);
+
+                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
+
+            }
+
+
+            this.update = function() {
+                
+                var lista = pedras.getAll('exists', true);
+                for (var i = 0; i < lista.length; i++) {
+                    if (lista[i].body.y > 300) {
+                        lista[i].outOfBoundsKill = true;
+                        lista[i].checkWorldBounds = true;
+                    }
+                }
+                
+                var lista2 = barcoInimigo.getAll('exists', true);
+                for (var i = 0; i < lista2.length; i++) {
+                    if (lista2[i].body.y > 300) {
+                        lista2[i].outOfBoundsKill = true;
+                        lista2[i].checkWorldBounds = true;
+                    }
+                }
+
+                game.physics.arcade.collide(barco, [parede,parede2]);
+
                 tipoVerificacao = 0;
-	            game.physics.arcade.overlap(barco, pedras, collisionHandler, null, this);
+                game.physics.arcade.overlap(barco, pedras, collisionHandler, null, this);
                 tipoVerificacao = 1;
-	            game.physics.arcade.overlap(barco, barcoInimigo, collisionHandler, null, this);
+                game.physics.arcade.overlap(barco, barcoInimigo, collisionHandler, null, this);
                 tipoVerificacao = 2;
-	           game.physics.arcade.overlap(barco, balasInimigas, collisionHandler, null, this);
+                game.physics.arcade.overlap(barco, balasInimigas, collisionHandler, null, this);
+
+                game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
+
+                game.physics.arcade.overlap(balas, pedras, collisionHandler3, null, this);
                 
+                barco.body.velocity.setTo(0, 0);
+
+
+                if (cursors.right.isDown) {
+                    barco.body.velocity.x = 400;
+                    //barco.body.velocity.y = -333;
+
+                } else if (cursors.left.isDown) {
+                    barco.body.velocity.x = -400;
+
+                }
+
+                if (cursors.up.isDown) {
+                    barco.body.velocity.y = -400;
+
+                } else if (cursors.down.isDown) {
+                    barco.body.velocity.y = 400;
+
+                }
+                //Clicar para atirar
+                if (liberaAtirar === true) {
+                    if (atira.isDown) {
+                        var agora = game.time.now;
+                        var deltaT = agora - timeUltimoTiro;
+                        if (deltaT >= fireInterval) {
+                            timeUltimoTiro = agora;
+                            fire();
+                        }
+                    }
+                }
+
+                if (game.time.now > firingTimer) {
+                    inimigoFires();
+                    inimigoFires();
+                }
+
+
+                //Move o fundo
+                fundo.tilePosition.y += 2;
+                ilha.tilePosition.y += 2;
                 
-	           game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
-	
-	        barco.body.velocity.setTo(0, 0);
-	
-	
-	
-	    if (cursors.right.isDown)
-	                {
-	                   barco.body.velocity.x = 400;
-	                   //barco.body.velocity.y = -333;
-	
-	                }
-	            else if (cursors.left.isDown)
-	                {
-	                   barco.body.velocity.x = -400;
-	
-	                }
-	
-	            if (cursors.up.isDown)
-	                {
-	                   barco.body.velocity.y = -400;
-	
-	                }
-	            else if (cursors.down.isDown)
-	                {
-	                   barco.body.velocity.y = 400;
-	
-	         }
-	            //Clicar para atirar
-	    if(liberaAtirar === true){
-	        if (atira.isDown)
-	        {
-	            var agora = game.time.now;
-	            var deltaT = agora - timeUltimoTiro;
-	            if (deltaT >= fireInterval) {
-	                timeUltimoTiro = agora;
-	                fire();
-	            }
-	        }
-	    }
-	
-	    if(game.time.now > firingTimer) {
-	            inimigoFires();
-	    }
-	
-	
-	        //Move o fundo
-	
-	
-	        //Move florestas
-	        florestaEsquerda.tilePosition.y += 2;
-	        florestaDireita.tilePosition.y += 2;
-	fundo.tilePosition.y += 2;
-	
-	
-	        //barco.body.onBeginContact.add(blockHit, this);
-	
-	        }
-	
-	
-	function contaDistancia() {
-	
-	    distancia++;
-	
-	    textoDistancia.setText('Distancia: ' + distancia);
-	
-	}
-	
-	function contaInimigos(){
-	    
-	    InimigosMortos++;
-	    textoInimigos.setText('Inimigos:' + InimigosMortos);
-	}
-	
-	
-	function liberaBarcoInimigo() {
-	             var barcoinimigo = barcoInimigo.create(Math.random() * (971 - 309) + 309,-20, 'barcoinimigo');
-        
-	             barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
-	             barcoinimigo.body.enable = true;
-	             barcoinimigo.body.velocity.y = 100;
-	             barcoinimigo.scale.setTo(0.5,0.5);
-        
+
+
+            }
+
+
+            function contaDistancia() {
+
+                distancia++;
+
+                textoDistancia.setText('Distancia: ' + distancia);
+
+            }
+
+            function contaInimigos() {
+
+                InimigosMortos++;
+                textoInimigos.setText('Inimigos: ' + InimigosMortos);
+            }
+
+
+            function liberaBarcoInimigo() {
+                
+                var barcoinimigo = barcoInimigo.getRandomNotExists();
+                            
+                if(!barcoinimigo){
+                    barcoinimigo = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'barcoinimigo');
+                    barcoinimigo.outOfBoundsKill = false;
+                    barcoinimigo.checkWorldBounds = false;
+                } else {
+                    barcoinimigo.outOfBoundsKill = false;
+                    barcoinimigo.checkWorldBounds = false;
+                    barcoinimigo.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                }
+                barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
+                barcoinimigo.body.enable = true;
+                barcoinimigo.body.velocity.y = 180;
+                barcoinimigo.scale.setTo(0.5, 0.5);
+            }
+
+            function liberaPedras() {
+                
+                var pedra = pedras.getRandomNotExists();
+                if (!pedra) {
+                    pedra = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'pedra');
+                    pedra.outOfBoundsKill = false;
+                    pedra.checkWorldBounds = false;
+                } else {
+                    pedra.outOfBoundsKill = false;
+                    pedra.checkWorldBounds = false;
+                    pedra.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                }
+                pedra.physicsBodyType = Phaser.Physics.ARCADE;
+                pedra.body.enable = true;
+                pedra.body.velocity.y = 120;
+                pedra.anchor.x = 0.5;
+                pedra.anchor.y = 0.5;
+                
+                if (pedra.key == 'pedra') {
+                    
+                    pedra.scale.setTo(0.25, 0.25);
+                    pedra.body.setCircle(140 * 0.25, 250, 250);
+                }else if (pedra.key == 'pedra2') {
+                    
+                    pedra.scale.setTo(0.25, 0.25);
+                    pedra.body.setCircle(140 * 0.25, 250, 250);
+                }else if(pedra.key == 'pedra3'){
+                    
+                    pedra.scale.setTo(0.25, 0.25);
+                    pedra.body.setCircle(80 * 0.25, 250, 250);
+                }
+                    
+
+                //var idx = (Math.random() * 3) | 0;
+                //
+                //var pedra = pedras[idx].getFirstExists(false);
+                //if (pedra) {
+                //    pedra.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                //    pedra.physicsBodyType = Phaser.Physics.ARCADE;
+                //    pedra.body.enable = true;
+                //    pedra.body.velocity.y = 120;
+                //    pedra.body.setSize(250, 250, 125, 125);
+                //    pedra.scale.setTo(0.25, 0.25);
+                //    pedra.body.setCircle(32.5);
+                //}
+
                 //var estaSobreAlguem;
                 //do {
                 //    estaSobreAlguem = false;
-                //    barcoinimigo.body.position.x = Math.random() * (971 - 309) + 309;
-                //    game.physics.arcade.overlap(barcoinimigo, barcoInimigo, function (a, b) {
-                //        if (barcoinimigo !== b) {
+                //    pedra.body.position.x = Math.random() * (971 - 309) + 309;
+                //    game.physics.arcade.overlap(pedra, barcoInimigo, function () {
+                //        estaSobreAlguem = true;
+                //    }, null, this);
+                //    game.physics.arcade.overlap(pedra, pedras, function (a, b) {
+                //        if (pedra !== b) {
                 //            estaSobreAlguem = true;
                 //        }
                 //    }, null, this);
-                //    game.physics.arcade.overlap(barcoinimigo, pedras, function () {
-                //        estaSobreAlguem = true;
-                //    }, null, this);
                 //} while (estaSobreAlguem);
-	}
-	
-	function liberaPedras(){
-	        pedra = pedras.create(Math.random() * (971 - 309) + 309,-20, 'pedra');
-	        pedra.physicsBodyType = Phaser.Physics.ARCADE;
-	        pedra.body.enable = true;
-	        pedra.body.velocity.y = 100;
-	        pedra.scale.setTo(0.05,0.05);
-       
-               //var estaSobreAlguem;
-               //do {
-               //    estaSobreAlguem = false;
-               //    pedra.body.position.x = Math.random() * (971 - 309) + 309;
-               //    game.physics.arcade.overlap(pedra, barcoInimigo, function () {
-               //        estaSobreAlguem = true;
-               //    }, null, this);
-               //    game.physics.arcade.overlap(pedra, pedras, function (a, b) {
-               //        if (pedra !== b) {
-               //            estaSobreAlguem = true;
-               //        }
-               //    }, null, this);
-               //} while (estaSobreAlguem);
-	}
-	
-	
-	
-	function collisionHandler(barco,objetoColidido){
-	    objetoColidido.kill();
-	
-	    var vida = vidas.getFirstAlive();
-	
-	    if(vida){
-	        vida.kill();
-	    }
-	
-	    if (vidas.countLiving() < 1)
-	    {
-	        barco.kill();
-	        pedras.callAll('kill');
-	       barcoInimigo.callAll('kill');
-	       balasInimigas.callAll('kill');
-	        liberaAtirar = false;
-	        game.time.events.remove(loopPedras);
-	        game.time.events.remove(loopBarIni);
-	        game.time.events.remove(loopDist);
-	
-	        textoFim.text="  Você percorreu: \n"+ "      " +  distancia + " Metros";
-	        textoFim.visible = true;
-	
-	        game.input.onTap.addOnce(restart,this);
-	    }
-	    var explosao = explosoes.getFirstExists(false);
-	    explosao.reset(barco.body.x, barco.body.y);
-	    explosao.animations.add('explode');
-	    explosao.play('explode', 180,false, true);
-	}
-	
-	function collisionHandler2(bala, barcoinimigo) {
-	        bala.kill();
-	        barcoinimigo.kill();
-	
-	        var explosao = explosoes.getFirstExists(false);
-	        explosao.reset(barcoinimigo.body.x, barcoinimigo.body.y);
-	        explosao.animations.add('explode');
-	        explosao.play('explode', 180,false, true);
-	        
-	        contaInimigos();
-	
-	}
-	
-	function fire() {
-	
-	    if (game.time.now > bulletTime)
-	    {
-	
-	        var bala = balas.getFirstExists(false);
-	
-	        if (bala)
-	        {
-	            //  And fire it
-	            bala.reset(barco.x, barco.y - 57);
-	            bala.body.velocity.y = -800;
-	            bulletTime = game.time.now + 200;
-	            bala.scale.setTo(0.4,0.4);
-	        }
-	    }
-	
-	}
-	
-	function inimigoFires() {
-	        var balaInimiga = balasInimigas.getFirstExists(false);
-	
-	        inimigosVivos = [];
-	
-	        barcoInimigo.forEachAlive(function(barcoinimigo) {
-	            inimigosVivos.push(barcoinimigo);
-	        });
-	
-	        if(balaInimiga && inimigosVivos.length > 0) {
-	            var random = game.rnd.integerInRange(0,inimigosVivos.length-1);
-	
-	            //Seleciona um inimigo aleatório
-	            var shooter = inimigosVivos[random];
-	
-	            //E o inimigo atirar
-	            balaInimiga.reset(shooter.body.x, shooter.body.y);
-	
-	            game.physics.arcade.moveToObject(balaInimiga, barco, 180);
-	            balaInimiga.scale.setTo(0.4, 0.4);
-	            firingTimer = game.time.now + 2000;
-	        }
-	
-	
-	}
-	
-	function restart () {
-	    //resets the life count
-	    vidas.callAll('revive');
-	    //  And brings the aliens back from the dead :)
-	    game.events
-	        liberaAtirar = true;
-	    //revives the player
-	    barco.revive();
-	    //hides the text
-	    textoFim.visible = false;
-	    distancia = 0;
-	    loopPedras = game.time.events.loop(1500, liberaPedras, this);
-	    loopBarIni = game.time.events.loop(1500, liberaBarcoInimigo, this);
-	    loopDist = game.time.events.loop(100, contaDistancia, this);
-	    barco.reset(640, 680);
-	}
-	
-	//function blockHit (body, bodyB, shapeA, shapeB, equation) {
-	//    if (body)
-	//    {
-	//        bala.kill();
-	//        player.kill();
-	//    }
-	//
-	//}
-	
-	this.render = function (){
-	    //game.debug.spriteBounds(barco);
-	}
-	
-	
-	}
-	    // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
-	    // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
-	    // dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
-	    // executar jogo.state.start("Nome da tela") a qualquer momento)
-	    game.state.add("TelaInicial", TelaInicial);
-	    game.state.start("TelaInicial");
-	
-	    //]]>
-	    </script>
+            }
+
+
+
+            function collisionHandler(barco, objetoColidido) {
+                objetoColidido.kill();
+
+                var vida = vidas.getFirstAlive();
+
+                if (vida) {
+                    vida.kill();
+                }
+
+                if (vidas.countLiving() < 1) {
+                    barco.kill();
+                    pedras.callAll('kill');
+                    barcoInimigo.callAll('kill');
+                    balasInimigas.callAll('kill');
+                    liberaAtirar = false;
+                    game.time.events.remove(loopPedras);
+                    game.time.events.remove(loopBarIni);
+                    game.time.events.remove(loopDist);
+
+                    textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
+                    textoFim.visible = true;
+                    game.input.onTap.addOnce(restart, this);
+                }
+                var explosao = explosoes.getFirstExists(false);
+                explosao.reset(barco.body.x, barco.body.y);
+                explosao.animations.add('explode');
+                explosao.play('explode', 180, false, true);
+            }
+
+            function collisionHandler2(bala, barcoinimigo) {
+                bala.kill();
+                barcoinimigo.kill();
+
+                var explosao = explosoes.getFirstExists(false);
+                explosao.reset(barcoinimigo.body.x, barcoinimigo.body.y);
+                explosao.animations.add('explode');
+                explosao.play('explode', 180, false, true);
+
+                contaInimigos();
+            }
+
+            function collisionHandler3(bala, pedra) {
+                bala.kill();
+            }
+
+            function fire() {
+
+                if (game.time.now > bulletTime) {
+
+                    var bala = balas.getFirstExists(false);
+
+                    if (bala) {
+                        //  And fire it
+                        bala.reset(barco.x, barco.y - 57);
+                        bala.body.velocity.y = -600;
+                        bulletTime = game.time.now + 25;
+                        bala.scale.setTo(0.3, 0.3);
+                    }
+                }
+
+            }
+
+            function inimigoFires() {
+                var balaInimiga = balasInimigas.getFirstExists(false);
+
+                inimigosVivos = [];
+
+                barcoInimigo.forEachAlive(function(barcoinimigo) {
+                    inimigosVivos.push(barcoinimigo);
+                });
+
+                if (balaInimiga && inimigosVivos.length > 0) {
+                    var random = game.rnd.integerInRange(0, inimigosVivos.length - 1);
+
+                    //Seleciona um inimigo aleatório
+                    var shooter = inimigosVivos[random];
+
+                    //E o inimigo atirar
+                    balaInimiga.reset(shooter.body.x, shooter.body.y);
+
+                    game.physics.arcade.moveToObject(balaInimiga, barco, 400);
+                    balaInimiga.scale.setTo(0.4, 0.4);
+                    firingTimer = game.time.now + 1300;
+                }
+
+
+            }
+
+            function restart() {
+                //resets the life count
+                vidas.callAll('revive');
+                //  And brings the aliens back from the dead :)
+                
+                liberaAtirar = true;
+                //Revive o barco
+                barco.revive();
+                //esconde o texto
+                textoFim.visible = false;
+                distancia = 0;
+                InimigosMortos = 0;
+                textoInimigos.text = "Inimigos: " + 0;
+                loopPedras = game.time.events.loop(2000, liberaPedras, this);
+                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
+                loopDist = game.time.events.loop(100, contaDistancia, this);
+                barco.reset(640, 680);
+            }
+
+
+            this.render = function() {
+                //game.debug.spriteBounds(barco);
+                //game.debug.body(pedras);
+            }
+
+
+        }
+        
+        function TelaMenu(game){
+            
+            // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
+            this.init = function() {
+
+                game.input.maxPointers = 1;
+
+                // Deixar o jogo executando, mesmo se o browser mudar de aba?
+                game.stage.disableVisibilityChange = false;
+
+                if (game.device.desktop) {
+                    // Configurações específicas para desktop
+
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                } else {
+                    // Configurações específicas para celulares
+
+                    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                    // Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
+                    game.scale.setMinMax(400, 300, 1280, 720);
+                    game.scale.forceLandscape = true;
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                }
+
+            }
+
+
+            this.preload = function() {
+                game.load.crossOrigin = "anonymous";
+
+                game.load.image('tela','Sprites/srcoutoo.jpg',1280,720);
+                game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
+                game.load.spritesheet('btnPlay', 'Sprites/play.jpg');
+                game.load.spritesheet('btnPlayOver', 'Sprites/playOver.jpg');
+                game.load.spritesheet('btnLoja', 'Sprites/loja.jpg');
+                game.load.spritesheet('btnLojaOver', 'Sprites/LojaOver.jpg');
+                game.load.image('engrenagem','Sprites/engrena.png');
+                
+            }
+            
+            var btnPlay;
+            var btnLoja;
+            var fundo;
+            var engrenagem;
+
+            this.create = function() {
+                
+                fundo = game.add.tileSprite(0,0,1280,720, 'tela');
+                
+                btnPlay = game.add.image(300,600, 'btnPlay');
+                btnPlay.scale.setTo(1.2,1.2);
+                
+                btnLoja = game.add.image(700,600, 'btnLoja');
+                btnLoja.scale.setTo(1.2,1.2);
+                
+                btnPlay.inputEnabled = true;
+                btnPlay.events.onInputDown.add(clica, this);
+                
+                btnLoja.inputEnabled = true;
+                btnLoja.events.onInputDown.add(clica, this);
+                
+                btnPlay.events.onInputOver.add(clicaOverPlay, this);
+                btnLoja.events.onInputOver.add(clicaOverLoja, this);
+                
+                btnPlay.events.onInputOut.add(clicaOutPlay, this);
+                btnLoja.events.onInputOut.add(clicaOutLoja, this);
+                
+                engrenagem = game.add.image(1180,0, 'engrenagem');
+                engrenagem.scale.setTo(0.1,0.1);
+                
+            }
+            
+            function clica(){
+                game.state.start("TelaInicial");
+            }
+            
+            function clicaOverPlay(){
+                btnPlay = game.add.image(300,600, 'btnPlayOver');
+                btnPlay.scale.setTo(1.2,1.2);
+            }
+            
+            function clicaOverLoja(){
+                btnLoja = game.add.image(700,600, 'btnLojaOver');
+                btnLoja.scale.setTo(1.2,1.2);
+            }
+            
+            function clicaOutPlay(){
+                btnLoja = game.add.image(300,600, 'btnPlay');
+                btnLoja.scale.setTo(1.2,1.2);
+            }
+            
+            function clicaOutLoja(){
+                btnLoja = game.add.image(700,600, 'btnLoja');
+                btnLoja.scale.setTo(1.2,1.2);
+            }
+            
+            
+
+
+            this.update = function() {
+
+            }
+
+
+            this.render = function() {
+                //game.debug.spriteBounds(barco);
+            }
+
+
+        
+            
+        }
+        // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
+        // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
+        // dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
+        // executar jogo.state.start("Nome da tela") a qualquer momento)
+        game.state.add("TelaInicial", TelaInicial);
+        game.state.add("TelaMenu", TelaMenu);
+        game.state.start("TelaMenu");
+        
+        
+
+        //]]>
+    </script>
 </body>
+
 </html>
