@@ -46,6 +46,8 @@
 
         // Vamos chamar a variável de game, para ficar igual ao sandbox!
         var game = new Phaser.Game(1280, 720, Phaser.CANVAS, "divJogo");
+        
+
 
         function TelaInicial(game) {
 
@@ -74,11 +76,25 @@
                 }
 
             }
+            function createText() {
 
+    text = game.add.text(game.world.centerX, game.world.centerY, "- phaser -\nrocking with\ngoogle web fonts");
+    text.anchor.setTo(0.5);
+
+    text.font = 'Revalia';
+    text.fontSize = 60;
+
+    text.align = 'center';
+    text.stroke = '#000000';
+}
+
+ 
 
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
-
+                
+                game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
+                
                 game.load.image('ship', 'Sprites/Fragatinha.png');
                 game.load.image('barcoinimigo', 'Sprites/ship2.png')
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
@@ -97,7 +113,12 @@
                 game.load.image('pedra2', 'Sprites/pedra2.png');
                 game.load.image('pedra3', 'Sprites/pedra3.png');
                 
+                game.load.image('menu', 'Sprites/menu.jpg');
+                game.load.image('menuOver', 'Sprites/menuOver.jpg');
+                
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
+                
+                game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
             }
 
@@ -153,13 +174,17 @@
             var tipoVerificacao = 0;
 
             var liberaAtirar = true;
+            
+            var botaoMenu;
 
             this.create = function() {
 
 
                 game.stage.backgroundColor = "#3498db";
                 game.physics.startSystem(Phaser.Physics.ARCADE);
-
+                
+                
+                
                 //AGUA
 
                 fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
@@ -221,8 +246,14 @@
                 balasInimigas.setAll('anchor.y', 0.5);
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
-
                 
+                botaoMenu = game.add.image(540,450, 'menu');
+                botaoMenu.scale.setTo(1.2);
+                botaoMenu.visible = false;
+                botaoMenu.inputEnabled = true;
+                botaoMenu.events.onInputDown.add(clica, this);
+                botaoMenu.events.onInputOver.add(clicaOverMenu, this);
+                botaoMenu.events.onInputOut.add(clicaOutPlay, this);clicaOutPlay
                 //CORAÇÕES
                 vidas = game.add.group();
                 for (var i = 0; i < 3; i++) {
@@ -251,7 +282,7 @@
 
 
                 textoFim = game.add.text(game.world.centerX, game.world.centerY, ' ', {
-                    font: '84px Arial',
+                    font: '84px Revalia',
                     fill: '#fff'
                 });
                 textoFim.anchor.setTo(0.5, 0.5);
@@ -271,6 +302,20 @@
 
             }
 
+            function clica() { 
+            
+                game.state.start("TelaMenu");
+            }
+            
+            function clicaOverMenu(){
+                botaoMenu = game.add.image(540,450, 'menuOver');
+                botaoMenu.scale.setTo(1.2,1.2);
+            }
+            
+            function clicaOutPlay(){
+                botaoMenu = game.add.image(540,450, 'menu');
+                botaoMenu.scale.setTo(1.2,1.2);
+            }            
 
             this.update = function() {
                 
@@ -381,6 +426,8 @@
                 barcoinimigo.body.enable = true;
                 barcoinimigo.body.velocity.y = 180;
                 barcoinimigo.scale.setTo(0.5, 0.5);
+                barcoinimigo.anchor.x = 0.5;
+                barcoinimigo.anchor.y = 0.5;
             }
 
             function liberaPedras() {
@@ -414,37 +461,7 @@
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(80 * 0.25, 250, 250);
                 }
-                    
-
-                //var idx = (Math.random() * 3) | 0;
-                //
-                //var pedra = pedras[idx].getFirstExists(false);
-                //if (pedra) {
-                //    pedra.reset(Math.random() * (900 - 362.5) + 362.5, -100);
-                //    pedra.physicsBodyType = Phaser.Physics.ARCADE;
-                //    pedra.body.enable = true;
-                //    pedra.body.velocity.y = 120;
-                //    pedra.body.setSize(250, 250, 125, 125);
-                //    pedra.scale.setTo(0.25, 0.25);
-                //    pedra.body.setCircle(32.5);
-                //}
-
-                //var estaSobreAlguem;
-                //do {
-                //    estaSobreAlguem = false;
-                //    pedra.body.position.x = Math.random() * (971 - 309) + 309;
-                //    game.physics.arcade.overlap(pedra, barcoInimigo, function () {
-                //        estaSobreAlguem = true;
-                //    }, null, this);
-                //    game.physics.arcade.overlap(pedra, pedras, function (a, b) {
-                //        if (pedra !== b) {
-                //            estaSobreAlguem = true;
-                //        }
-                //    }, null, this);
-                //} while (estaSobreAlguem);
             }
-
-
 
             function collisionHandler(barco, objetoColidido) {
                 objetoColidido.kill();
@@ -468,6 +485,8 @@
                     textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
                     textoFim.visible = true;
                     game.input.onTap.addOnce(restart, this);
+                    
+                    botaoMenu.visible = true;
                 }
                 var explosao = explosoes.getFirstExists(false);
                 explosao.reset(barco.body.x, barco.body.y);
@@ -524,7 +543,7 @@
                     var shooter = inimigosVivos[random];
 
                     //E o inimigo atirar
-                    balaInimiga.reset(shooter.body.x, shooter.body.y);
+                    balaInimiga.reset(shooter.body.x + 16.5, shooter.body.y + 60);
 
                     game.physics.arcade.moveToObject(balaInimiga, barco, 400);
                     balaInimiga.scale.setTo(0.4, 0.4);
@@ -544,6 +563,7 @@
                 barco.revive();
                 //esconde o texto
                 textoFim.visible = false;
+                botaoMenu.visible = false;
                 distancia = 0;
                 InimigosMortos = 0;
                 textoInimigos.text = "Inimigos: " + 0;
