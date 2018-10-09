@@ -30,11 +30,30 @@
 
     <div id="divJogo"></div>
 
+                   
     <script type="text/javascript" src="phaser.min.js"></script>
     <script type="text/javascript">
         //<![CDATA[
         "use strict";
 
+        window.WebFontConfig = {
+            //  'active' means all requested fonts have finished loading
+            //  We set a 1 second delay before calling 'createText'.
+            //  For some reason if we don't the browser cannot render the text the first time it's created.
+            active: function() {
+                setTimeout(function () {
+                    game.state.start("TelaMenu");
+                }, 1000);
+            },
+
+            //  The Google Fonts we want to load (specify as many as you like in the array)
+            google: {
+              families: ['Indie+Flower']
+            }
+
+        };
+
+        
         // https://github.com/photonstorm/phaser/blob/v2.6.2/src/core/Group.js#L2372
         Phaser.Group.prototype.getRandomNotExists = function (startIndex, endIndex) {
             var list = this.getAll('exists', false, startIndex, endIndex);
@@ -76,24 +95,11 @@
                 }
 
             }
-            function createText() {
-
-    text = game.add.text(game.world.centerX, game.world.centerY, "- phaser -\nrocking with\ngoogle web fonts");
-    text.anchor.setTo(0.5);
-
-    text.font = 'Revalia';
-    text.fontSize = 60;
-
-    text.align = 'center';
-    text.stroke = '#000000';
-}
 
  
 
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
-                
-                game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
                 
                 game.load.image('ship', 'Sprites/Fragatinha.png');
                 game.load.image('barcoinimigo', 'Sprites/ship2.png')
@@ -117,8 +123,6 @@
                 game.load.image('menuOver', 'Sprites/menuOver.jpg');
                 
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
-                
-                game.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
             }
 
@@ -182,6 +186,7 @@
 
                 game.stage.backgroundColor = "#3498db";
                 game.physics.startSystem(Phaser.Physics.ARCADE);
+                
                 
                 
                 
@@ -253,7 +258,7 @@
                 botaoMenu.inputEnabled = true;
                 botaoMenu.events.onInputDown.add(clica, this);
                 botaoMenu.events.onInputOver.add(clicaOverMenu, this);
-                botaoMenu.events.onInputOut.add(clicaOutPlay, this);clicaOutPlay
+                botaoMenu.events.onInputOut.add(clicaOutPlay, this);
                 //CORAÇÕES
                 vidas = game.add.group();
                 for (var i = 0; i < 3; i++) {
@@ -282,7 +287,7 @@
 
 
                 textoFim = game.add.text(game.world.centerX, game.world.centerY, ' ', {
-                    font: '84px Revalia',
+                    font: '84px Indie Flower',
                     fill: '#fff'
                 });
                 textoFim.anchor.setTo(0.5, 0.5);
@@ -292,6 +297,7 @@
                 //TECLADO
                 cursors = game.input.keyboard.createCursorKeys();
                 atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+                liberaAtirar = true;
 
                 //Loop para contar distancia
                 loopDist = game.time.events.loop(90, contaDistancia, this);
@@ -564,6 +570,7 @@
                 //esconde o texto
                 textoFim.visible = false;
                 botaoMenu.visible = false;
+                
                 distancia = 0;
                 InimigosMortos = 0;
                 textoInimigos.text = "Inimigos: " + 0;
@@ -643,7 +650,7 @@
                 btnPlay.events.onInputDown.add(clica, this);
                 
                 btnLoja.inputEnabled = true;
-                btnLoja.events.onInputDown.add(clica, this);
+                
                 
                 btnPlay.events.onInputOver.add(clicaOverPlay, this);
                 btnLoja.events.onInputOver.add(clicaOverLoja, this);
@@ -654,10 +661,13 @@
                 engrenagem = game.add.image(1180,0, 'engrenagem');
                 engrenagem.scale.setTo(0.1,0.1);
                 
+                
+                
             }
             
             function clica(){
                 game.state.start("TelaInicial");
+                
             }
             
             function clicaOverPlay(){
@@ -702,12 +712,9 @@
         // executar jogo.state.start("Nome da tela") a qualquer momento)
         game.state.add("TelaInicial", TelaInicial);
         game.state.add("TelaMenu", TelaMenu);
-        game.state.start("TelaMenu");
-        
-        
-
         //]]>
     </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
 </body>
 
 </html>
