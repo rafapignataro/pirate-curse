@@ -181,13 +181,8 @@
 
 
             this.create = function() {
-
-
                 game.stage.backgroundColor = "#3498db";
                 game.physics.startSystem(Phaser.Physics.ARCADE);
-
-
-
 
                 //AGUA
 
@@ -297,19 +292,11 @@
                 //TECLADO
                 cursors = game.input.keyboard.createCursorKeys();
                 atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-                liberaAtirar = true;
 
-                //Loop para contar distancia
-                loopDist = game.time.events.loop(90, contaDistancia, this);
-
-                loopPedras = game.time.events.loop(2000, liberaPedras, this);
-
-                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-
+                restart();
             }
 
             function clica() {
-
                 game.state.start("TelaMenu");
             }
 
@@ -648,7 +635,6 @@
 
                 btnPlay.inputEnabled = true;
                 btnPlay.events.onInputDown.add(clica, this);
-                btnPlay.events.onInputDown.add(restart, this);
 
                 btnLoja.inputEnabled = true;
 
@@ -660,51 +646,10 @@
 
                 engrenagem = game.add.image(1180,0, 'engrenagem');
                 engrenagem.scale.setTo(0.1,0.1);
-
-            }
-
-            function restart() {
-                //resets the life count
-                vidas.callAll('revive');
-                //  And brings the aliens back from the dead :)
-
-                liberaAtirar = true;
-                //Revive o barco
-                barco.revive();
-                //esconde o texto
-                textoFim.visible = false;
-                botaoMenu.visible = false;
-
-                distancia = 0;
-                InimigosMortos = 0;
-                textoInimigos.text = "Inimigos: " + 0;
-                loopPedras = game.time.events.loop(2000, liberaPedras, this);
-                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-                loopDist = game.time.events.loop(100, contaDistancia, this);
-                barco.reset(640, 680);
             }
 
             function clica(){
                 game.state.start("TelaInicial");
-
-                //resets the life count
-                vidas.callAll('revive');
-                //  And brings the aliens back from the dead :)
-
-                liberaAtirar = true;
-                //Revive o barco
-                barco.revive();
-                //esconde o texto
-                textoFim.visible = false;
-                botaoMenu.visible = false;
-
-                distancia = 0;
-                InimigosMortos = 0;
-                textoInimigos.text = "Inimigos: " + 0;
-                loopPedras = game.time.events.loop(2000, liberaPedras, this);
-                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-                loopDist = game.time.events.loop(100, contaDistancia, this);
-                barco.reset(640, 680);
             }
 
             function clicaOverPlay(){
@@ -736,10 +681,6 @@
             this.render = function() {
                 //game.debug.spriteBounds(barco);
             }
-
-
-
-
         }
         // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
         // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
