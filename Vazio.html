@@ -64,15 +64,20 @@
         // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
 
         // Vamos chamar a variável de game, para ficar igual ao sandbox!
-        var game = new Phaser.Game(1280, 720, Phaser.CANVAS, "divJogo");
+        var game = new Phaser.Game(1280, 720, Phaser.AUTO, "divJogo");
         //Variaveis sprites
         var barco;
+        var aguaBarco;
         var cursors;
         var atira;
         var barcoInimigo;
+        
+        //Variaveis aceleracao
+        var aceleracaoMover = 1250, aceleracaoParar = 1750;
 
         //Variaveis background
         var fundo;
+        var filtro;
         var ilha;
 
         var parede;
@@ -155,6 +160,7 @@
                 game.load.crossOrigin = "anonymous";
 
                 game.load.image('ship', 'Sprites/Fragatinha.png');
+                game.load.spritesheet('AguaMove', 'Sprites/WaterEffect.png', 158, 430);
                 game.load.image('barcoinimigo', 'Sprites/ship2.png')
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
                 game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
@@ -175,7 +181,8 @@
                 game.load.image('menu', 'Sprites/menu.jpg');
                 game.load.image('menuOver', 'Sprites/menuOver.jpg');
 
-                game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
+                //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
+                game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
 
             }
 
@@ -187,6 +194,42 @@
                 //AGUA
 
                 fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
+                
+                // Utilizando uma versão modificada do shader do exemplo https://phaser.io/examples/v2/filters/rainbow-bars
+                //var fragmentSrc = [
+                //    "precision mediump float;",
+                //    "uniform vec2      resolution;",
+                //    "uniform float     time;",
+                //
+                //    "void main( void )",
+                //    "{",
+                //        "vec2 p = ( gl_FragCoord.xy / resolution.xy ) * 2.0 - 1.0;",
+                //
+                //        "vec3 c = vec3( 0.0 );",
+                //
+                //        "float amplitude = 0.50;",
+                //        "float glowT = sin(time) * 0.5 + 0.5;",
+                //        "float glowFactor = mix( 0.15, 0.35, glowT );",
+                //
+                //        "c += vec3(0.02, 0.03, 0.13) * ( glowFactor * abs( 1.0 / sin(p.x + sin( p.y + time ) * amplitude ) ));",
+                //        "c += vec3(0.02, 0.10, 0.03) * ( glowFactor * abs( 1.0 / sin(p.x + cos( p.y + time+1.00 ) * amplitude+0.1 ) ));",
+                //        "c += vec3(0.15, 0.05, 0.20) * ( glowFactor * abs( 1.0 / sin(p.y + sin( p.x + time+1.30 ) * amplitude+0.15 ) ));",
+                //        "c += vec3(0.20, 0.05, 0.05) * ( glowFactor * abs( 1.0 / sin(p.y + cos( p.x + time+3.00 ) * amplitude+0.3 ) ));",
+                //        "c += vec3(0.17, 0.17, 0.05) * ( glowFactor * abs( 1.0 / sin(p.y + cos( p.x + time+5.00 ) * amplitude+0.2 ) ));",
+                //
+                //        "c *= 0.75;", // Multiplicamos por 0.75 para escurecer um pouco (quanto menor, mais escuro)
+                //
+                //        "gl_FragColor = vec4( c, 1.0 );",
+                //    "}"
+                //];
+                //var fundoFiltro = game.add.sprite();
+                //fundoFiltro.width = 1280;
+                //fundoFiltro.height = 720;
+                //filtro = new Phaser.Filter(game, null, fragmentSrc);
+                //filtro.setResolution(1280, 720);
+                //filtro.alpha = 0.2;
+                //fundoFiltro.filters = [ filtro ];
+                
                 ilha = game.add.tileSprite(0,0,1280,1440,'ilha');
 
                 //PEDRAS
@@ -211,13 +254,24 @@
                 parede.body.immovable = true
                 parede2.body.immovable = true;
 
+                aguaBarco = game.make.sprite(0, 0, 'AguaMove');
+                aguaBarco.scale.setTo(0.4);
+                aguaBarco.anchor.setTo(0.5, 0.5);
+                aguaBarco.animations.add("movimento", [0, 1, 2, 3, 4], 12, true);
+                aguaBarco.animations.play("movimento");
+                
                 //BARCO
                 barco = game.add.sprite(640, 600, 'ship');
                 game.physics.arcade.enable(barco);
                 barco.body.fixedRotation = true;
                 barco.body.collideWorldBounds = true;
+                barco.body.maxVelocity.x = 400;
+                barco.body.maxVelocity.y = 400;
                 barco.body.enable = true;
-                barco.anchor.setTo(0.5, 0.5);
+                barco.anchor.setTo(0.5, 0.77);
+                barco.addChild(aguaBarco);
+                barco.body.velocidadeAntigaX = 0;
+                barco.body.velocidadeAntigaY = 0;
 
                 //Balas
                 balas = game.add.group();
@@ -312,6 +366,8 @@
 
             this.update = function() {
 
+                //filtro.update();
+                
                 var lista = pedras.getAll('exists', true);
                 for (var i = 0; i < lista.length; i++) {
                     if (lista[i].body.y > 300) {
@@ -341,25 +397,8 @@
 
                 game.physics.arcade.overlap(balas, pedras, collisionHandler3, null, this);
 
-                barco.body.velocity.setTo(0, 0);
+                ajustaVelocidadeBarco();
 
-
-                if (cursors.right.isDown) {
-                    barco.body.velocity.x = 400;
-                    //barco.body.velocity.y = -333;
-
-                } else if (cursors.left.isDown) {
-                    barco.body.velocity.x = -400;
-
-                }
-
-                if (cursors.up.isDown) {
-                    barco.body.velocity.y = -400;
-
-                } else if (cursors.down.isDown) {
-                    barco.body.velocity.y = 400;
-
-                }
                 //Clicar para atirar
                 if (liberaAtirar === true) {
                     if (atira.isDown) {
@@ -381,12 +420,94 @@
                 //Move o fundo
                 fundo.tilePosition.y += 2;
                 ilha.tilePosition.y += 2;
-
-
-
             }
 
-
+            function ajustaVelocidadeBarco() {
+                var a = 0;
+                var v = barco.body.velocity.x;
+                if (cursors.left.isDown) {
+                    if (v > 0) {
+                        // Derrapando! (Poderíamos utilizar uma animação especial aqui, para mostrar a derrapagem)
+                        a = -aceleracaoParar;
+                    } else {
+                        a = -aceleracaoMover;
+                    }
+                } else if (cursors.right.isDown) {
+                    if (v < 0) {
+                        // Derrapando! (Poderíamos utilizar uma animação especial aqui, para mostrar a derrapagem)
+                        a = aceleracaoParar;
+                    } else {
+                        a = aceleracaoMover;
+                    }
+                } else {
+                    if (v > 0) {
+                        if (barco.body.velocidadeAntigaX < 0) {
+                            // Força a parada!
+                            a = 0;
+                            v = 0;
+                        } else {
+                            // Ainda estamos parando
+                            a = -aceleracaoParar;
+                        }
+                    } else if (v < 0) {
+                        if (barco.body.velocidadeAntigaX > 0) {
+                            // Força a parada!
+                            a = 0;
+                            v = 0;
+                        } else {
+                            // Ainda estamos parando
+                            a = aceleracaoParar;
+                        }
+                    }
+                }
+                barco.angle = v * 25 / barco.body.maxVelocity.x;
+                barco.body.velocidadeAntigaX = v;
+                barco.body.velocity.x = v;
+                barco.body.acceleration.x = a;
+                
+                var a = 0;
+                var v = barco.body.velocity.y;
+                if (cursors.up.isDown) {
+                    if (v > 0) {
+                        // Derrapando! (Poderíamos utilizar uma animação especial aqui, para mostrar a derrapagem)
+                        a = -aceleracaoParar;
+                    } else {
+                        a = -aceleracaoMover;
+                    }
+                } else if (cursors.down.isDown) {
+                    if (v < 0) {
+                        // Derrapando! (Poderíamos utilizar uma animação especial aqui, para mostrar a derrapagem)
+                        a = aceleracaoParar;
+                    } else {
+                        a = aceleracaoMover;
+                    }
+                } else {
+                    if (v > 0) {
+                        if (barco.body.velocidadeAntigaY < 0) {
+                            // Força a parada!
+                            a = 0;
+                            v = 0;
+                        } else {
+                            // Ainda estamos parando
+                            a = -aceleracaoParar;
+                        }
+                    } else if (v < 0) {
+                        if (barco.body.velocidadeAntigaY > 0) {
+                            // Força a parada!
+                            a = 0;
+                            v = 0;
+                        } else {
+                            // Ainda estamos parando
+                            a = aceleracaoParar;
+                        }
+                    }
+                }
+                barco.body.velocidadeAntigaY = v;
+                barco.body.velocity.y = v;
+                barco.body.acceleration.y = a;                
+            }
+            
+            
             function contaDistancia() {
 
                 distancia++;
@@ -565,12 +686,12 @@
                 loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
                 loopDist = game.time.events.loop(100, contaDistancia, this);
                 barco.reset(640, 680);
-            }
-
-
-            this.render = function() {
-                //game.debug.spriteBounds(barco);
-                //game.debug.body(pedras);
+                barco.body.velocity.x = 0;
+                barco.body.velocity.y = 0;
+                barco.body.acceleration.x = 0;
+                barco.body.acceleration.y = 0;
+                barco.body.velocidadeAntigaX = 0;
+                barco.body.velocidadeAntigaY = 0;
             }
 
 
@@ -609,7 +730,6 @@
                 game.load.crossOrigin = "anonymous";
 
                 game.load.image('tela','Sprites/srcoutoo.jpg',1280,720);
-                game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.spritesheet('btnPlay', 'Sprites/play.jpg');
                 game.load.spritesheet('btnPlayOver', 'Sprites/playOver.jpg');
                 game.load.spritesheet('btnLoja', 'Sprites/loja.jpg');
