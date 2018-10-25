@@ -48,7 +48,7 @@
 
             //  The Google Fonts we want to load (specify as many as you like in the array)
             google: {
-              families: ['Amatic+SC']
+              families: ['Indie+Flower']
             }
 
         };
@@ -287,7 +287,7 @@
 
 
                 textoFim = game.add.text(game.world.centerX, game.world.centerY, ' ', {
-                    font: '84px Amatic SC',
+                    font: '84px Indie Flower',
                     fill: '#fff'
                 });
                 textoFim.anchor.setTo(0.5, 0.5);
@@ -488,7 +488,7 @@
                     game.time.events.remove(loopBarIni);
                     game.time.events.remove(loopDist);
 
-                    textoFim.text = "   Você navegou por: \n " + "         " + distancia + " Metros";
+                    textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
                     textoFim.visible = true;
                     game.input.onTap.addOnce(restart, this);
                     
