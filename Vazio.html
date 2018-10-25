@@ -30,7 +30,7 @@
 
     <div id="divJogo"></div>
 
-                   
+
     <script type="text/javascript" src="phaser.min.js"></script>
     <script type="text/javascript">
         //<![CDATA[
@@ -53,19 +53,72 @@
 
         };
 
-        
+
         // https://github.com/photonstorm/phaser/blob/v2.6.2/src/core/Group.js#L2372
         Phaser.Group.prototype.getRandomNotExists = function (startIndex, endIndex) {
             var list = this.getAll('exists', false, startIndex, endIndex);
             return this.game.rnd.pick(list);
         };
 
-        
+
         // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
 
         // Vamos chamar a variável de game, para ficar igual ao sandbox!
         var game = new Phaser.Game(1280, 720, Phaser.CANVAS, "divJogo");
-        
+        //Variaveis sprites
+        var barco;
+        var cursors;
+        var atira;
+        var barcoInimigo;
+
+        //Variaveis background
+        var fundo;
+        var ilha;
+
+        var parede;
+        var parede2;
+
+
+        //Variaveis mecanica bala
+        var bulletTime = 0;
+        var fireInterval = 200;
+        var timeUltimoTiro = 0;
+        var nextFire = 0;
+
+        var balas;
+        var balasInimigas;
+        var InimigosMortos = 0;
+
+        var explosoes;
+
+        var pedras;
+
+        var inimigosVivos = [];
+        var firingTimer = 0;
+
+        //Variaveis texto
+        var textoDistancia = 0;
+        var textoInimigos = 0;
+
+        var textoFim = 0;
+
+        //Loopings
+        var loopPedras;
+        var loopDist;
+        var loopMoe;
+        var loopBarIni;
+        //Variaveis distancia
+        var distancia = 0;
+
+        var coracao;
+        var coracao2;
+        var coracao3;
+        var vidas = 3;
+        var tipoVerificacao = 0;
+
+        var liberaAtirar = true;
+
+        var botaoMenu;
 
 
         function TelaInicial(game) {
@@ -96,100 +149,46 @@
 
             }
 
- 
+
 
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
-                
+
                 game.load.image('ship', 'Sprites/Fragatinha.png');
                 game.load.image('barcoinimigo', 'Sprites/ship2.png')
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
                 game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
                 game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
                 game.load.image('coracao', 'Sprites/heart.png');
-                
+
                 game.load.image('pedra', 'Sprites/pedra1.png');
 
                 //Sprites mapa
                 game.load.spritesheet('waterP', 'Sprites/marLoop.jpg', 1280, 1440);
                 game.load.spritesheet('ilha', 'Sprites/ilhazinha.png',1280,1440);
                 game.load.image('parede', 'Sprites/Colisor.png');
-                
+
                 game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('pedra2', 'Sprites/pedra2.png');
                 game.load.image('pedra3', 'Sprites/pedra3.png');
-                
+
                 game.load.image('menu', 'Sprites/menu.jpg');
                 game.load.image('menuOver', 'Sprites/menuOver.jpg');
-                
+
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
 
             }
 
-            //Variaveis sprites
-            var barco;
-            var cursors;
-            var atira;
-            var barcoInimigo;
-
-            //Variaveis background
-            var fundo;
-            var ilha;
-            
-            var parede;
-            var parede2;
-
-
-            //Variaveis mecanica bala
-            var bulletTime = 0;
-            var fireInterval = 200;
-            var timeUltimoTiro = 0;
-            var nextFire = 0;
-
-            var balas;
-            var balasInimigas;
-            var InimigosMortos = 0;
-
-            var explosoes;
-
-            var pedras;
-
-            var inimigosVivos = [];
-            var firingTimer = 0;
-            
-            //Variaveis texto
-            var textoDistancia = 0;
-            var textoInimigos = 0;
-
-            var textoFim = 0;
-
-            //Loopings
-            var loopPedras;
-            var loopDist;
-            var loopMoe;
-            var loopBarIni;
-            //Variaveis distancia
-            var distancia = 0;
-
-            var coracao;
-            var coracao2;
-            var coracao3;
-            var vidas = 3;
-            var tipoVerificacao = 0;
-
-            var liberaAtirar = true;
-            
-            var botaoMenu;
 
             this.create = function() {
 
 
                 game.stage.backgroundColor = "#3498db";
                 game.physics.startSystem(Phaser.Physics.ARCADE);
-                
-                
-                
-                
+
+
+
+
                 //AGUA
 
                 fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
@@ -202,7 +201,7 @@
                 pedras.createMultiple(5, 'pedra2');
                 pedras.createMultiple(5, 'pedra3');
                 game.physics.arcade.enable(pedras, true);
-                
+
                 //Parede invisivel laterais
                 parede = game.add.sprite(0,0, 'parede');
                 parede2 = game.add.sprite(980,0, 'parede');
@@ -216,7 +215,7 @@
                 parede2.body.collideWorldBounds = true;
                 parede.body.immovable = true
                 parede2.body.immovable = true;
-                
+
                 //BARCO
                 barco = game.add.sprite(640, 600, 'ship');
                 game.physics.arcade.enable(barco);
@@ -240,8 +239,8 @@
                 barcoInimigo.enableBody = true;
                 barcoInimigo.createMultiple(15, 'barcoinimigo');
                 barcoInimigo.physicsBodyType = Phaser.Physics.ARCADE;
-                
-                
+
+
                 //Balas Inimigas
                 balasInimigas = game.add.group();
                 balasInimigas.enableBody = true;
@@ -251,7 +250,7 @@
                 balasInimigas.setAll('anchor.y', 0.5);
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
-                
+
                 botaoMenu = game.add.image(540,450, 'menu');
                 botaoMenu.scale.setTo(1.2);
                 botaoMenu.visible = false;
@@ -294,6 +293,7 @@
                 textoFim.visible = false;
 
 
+
                 //TECLADO
                 cursors = game.input.keyboard.createCursorKeys();
                 atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
@@ -308,23 +308,23 @@
 
             }
 
-            function clica() { 
-            
+            function clica() {
+
                 game.state.start("TelaMenu");
             }
-            
+
             function clicaOverMenu(){
                 botaoMenu = game.add.image(540,450, 'menuOver');
                 botaoMenu.scale.setTo(1.2,1.2);
             }
-            
+
             function clicaOutPlay(){
                 botaoMenu = game.add.image(540,450, 'menu');
                 botaoMenu.scale.setTo(1.2,1.2);
-            }            
+            }
 
             this.update = function() {
-                
+
                 var lista = pedras.getAll('exists', true);
                 for (var i = 0; i < lista.length; i++) {
                     if (lista[i].body.y > 300) {
@@ -332,7 +332,7 @@
                         lista[i].checkWorldBounds = true;
                     }
                 }
-                
+
                 var lista2 = barcoInimigo.getAll('exists', true);
                 for (var i = 0; i < lista2.length; i++) {
                     if (lista2[i].body.y > 300) {
@@ -353,7 +353,7 @@
                 game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
 
                 game.physics.arcade.overlap(balas, pedras, collisionHandler3, null, this);
-                
+
                 barco.body.velocity.setTo(0, 0);
 
 
@@ -394,7 +394,7 @@
                 //Move o fundo
                 fundo.tilePosition.y += 2;
                 ilha.tilePosition.y += 2;
-                
+
 
 
             }
@@ -416,9 +416,9 @@
 
 
             function liberaBarcoInimigo() {
-                
+
                 var barcoinimigo = barcoInimigo.getRandomNotExists();
-                            
+
                 if(!barcoinimigo){
                     barcoinimigo = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'barcoinimigo');
                     barcoinimigo.outOfBoundsKill = false;
@@ -437,7 +437,7 @@
             }
 
             function liberaPedras() {
-                
+
                 var pedra = pedras.getRandomNotExists();
                 if (!pedra) {
                     pedra = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'pedra');
@@ -453,17 +453,17 @@
                 pedra.body.velocity.y = 120;
                 pedra.anchor.x = 0.5;
                 pedra.anchor.y = 0.5;
-                
+
                 if (pedra.key == 'pedra') {
-                    
+
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(140 * 0.25, 250, 250);
                 }else if (pedra.key == 'pedra2') {
-                    
+
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(140 * 0.25, 250, 250);
                 }else if(pedra.key == 'pedra3'){
-                    
+
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(80 * 0.25, 250, 250);
                 }
@@ -491,7 +491,7 @@
                     textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
                     textoFim.visible = true;
                     game.input.onTap.addOnce(restart, this);
-                    
+
                     botaoMenu.visible = true;
                 }
                 var explosao = explosoes.getFirstExists(false);
@@ -563,14 +563,14 @@
                 //resets the life count
                 vidas.callAll('revive');
                 //  And brings the aliens back from the dead :)
-                
+
                 liberaAtirar = true;
                 //Revive o barco
                 barco.revive();
                 //esconde o texto
                 textoFim.visible = false;
                 botaoMenu.visible = false;
-                
+
                 distancia = 0;
                 InimigosMortos = 0;
                 textoInimigos.text = "Inimigos: " + 0;
@@ -588,9 +588,9 @@
 
 
         }
-        
+
         function TelaMenu(game){
-            
+
             // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
             this.init = function() {
 
@@ -628,69 +628,104 @@
                 game.load.spritesheet('btnLoja', 'Sprites/loja.jpg');
                 game.load.spritesheet('btnLojaOver', 'Sprites/LojaOver.jpg');
                 game.load.image('engrenagem','Sprites/engrena.png');
-                
+
             }
-            
+
             var btnPlay;
             var btnLoja;
             var fundo;
             var engrenagem;
 
             this.create = function() {
-                
+
                 fundo = game.add.tileSprite(0,0,1280,720, 'tela');
-                
+
                 btnPlay = game.add.image(300,600, 'btnPlay');
                 btnPlay.scale.setTo(1.2,1.2);
-                
+
                 btnLoja = game.add.image(700,600, 'btnLoja');
                 btnLoja.scale.setTo(1.2,1.2);
-                
+
                 btnPlay.inputEnabled = true;
                 btnPlay.events.onInputDown.add(clica, this);
-                
+                btnPlay.events.onInputDown.add(restart, this);
+
                 btnLoja.inputEnabled = true;
-                
-                
+
                 btnPlay.events.onInputOver.add(clicaOverPlay, this);
                 btnLoja.events.onInputOver.add(clicaOverLoja, this);
-                
+
                 btnPlay.events.onInputOut.add(clicaOutPlay, this);
                 btnLoja.events.onInputOut.add(clicaOutLoja, this);
-                
+
                 engrenagem = game.add.image(1180,0, 'engrenagem');
                 engrenagem.scale.setTo(0.1,0.1);
-                
-                
-                
+
             }
-            
+
+            function restart() {
+                //resets the life count
+                vidas.callAll('revive');
+                //  And brings the aliens back from the dead :)
+
+                liberaAtirar = true;
+                //Revive o barco
+                barco.revive();
+                //esconde o texto
+                textoFim.visible = false;
+                botaoMenu.visible = false;
+
+                distancia = 0;
+                InimigosMortos = 0;
+                textoInimigos.text = "Inimigos: " + 0;
+                loopPedras = game.time.events.loop(2000, liberaPedras, this);
+                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
+                loopDist = game.time.events.loop(100, contaDistancia, this);
+                barco.reset(640, 680);
+            }
+
             function clica(){
                 game.state.start("TelaInicial");
-                
+
+                //resets the life count
+                vidas.callAll('revive');
+                //  And brings the aliens back from the dead :)
+
+                liberaAtirar = true;
+                //Revive o barco
+                barco.revive();
+                //esconde o texto
+                textoFim.visible = false;
+                botaoMenu.visible = false;
+
+                distancia = 0;
+                InimigosMortos = 0;
+                textoInimigos.text = "Inimigos: " + 0;
+                loopPedras = game.time.events.loop(2000, liberaPedras, this);
+                loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
+                loopDist = game.time.events.loop(100, contaDistancia, this);
+                barco.reset(640, 680);
             }
-            
+
             function clicaOverPlay(){
                 btnPlay = game.add.image(300,600, 'btnPlayOver');
                 btnPlay.scale.setTo(1.2,1.2);
             }
-            
+
             function clicaOverLoja(){
                 btnLoja = game.add.image(700,600, 'btnLojaOver');
                 btnLoja.scale.setTo(1.2,1.2);
             }
-            
+
             function clicaOutPlay(){
                 btnLoja = game.add.image(300,600, 'btnPlay');
                 btnLoja.scale.setTo(1.2,1.2);
             }
-            
+
             function clicaOutLoja(){
                 btnLoja = game.add.image(700,600, 'btnLoja');
                 btnLoja.scale.setTo(1.2,1.2);
             }
-            
-            
 
 
             this.update = function() {
@@ -703,8 +738,8 @@
             }
 
 
-        
-            
+
+
         }
         // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
         // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
