@@ -194,41 +194,60 @@
                 //AGUA
 
                 fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
+                fundo.width = 1280;
+                fundo.height = 720;
+                //fundo.visible = false;
                 
-                // Utilizando uma versão modificada do shader do exemplo https://phaser.io/examples/v2/filters/rainbow-bars
-                //var fragmentSrc = [
-                //    "precision mediump float;",
-                //    "uniform vec2      resolution;",
-                //    "uniform float     time;",
-                //
-                //    "void main( void )",
-                //    "{",
-                //        "vec2 p = ( gl_FragCoord.xy / resolution.xy ) * 2.0 - 1.0;",
-                //
-                //        "vec3 c = vec3( 0.0 );",
-                //
-                //        "float amplitude = 0.50;",
-                //        "float glowT = sin(time) * 0.5 + 0.5;",
-                //        "float glowFactor = mix( 0.15, 0.35, glowT );",
-                //
-                //        "c += vec3(0.02, 0.03, 0.13) * ( glowFactor * abs( 1.0 / sin(p.x + sin( p.y + time ) * amplitude ) ));",
-                //        "c += vec3(0.02, 0.10, 0.03) * ( glowFactor * abs( 1.0 / sin(p.x + cos( p.y + time+1.00 ) * amplitude+0.1 ) ));",
-                //        "c += vec3(0.15, 0.05, 0.20) * ( glowFactor * abs( 1.0 / sin(p.y + sin( p.x + time+1.30 ) * amplitude+0.15 ) ));",
-                //        "c += vec3(0.20, 0.05, 0.05) * ( glowFactor * abs( 1.0 / sin(p.y + cos( p.x + time+3.00 ) * amplitude+0.3 ) ));",
-                //        "c += vec3(0.17, 0.17, 0.05) * ( glowFactor * abs( 1.0 / sin(p.y + cos( p.x + time+5.00 ) * amplitude+0.2 ) ));",
-                //
-                //        "c *= 0.75;", // Multiplicamos por 0.75 para escurecer um pouco (quanto menor, mais escuro)
-                //
-                //        "gl_FragColor = vec4( c, 1.0 );",
-                //    "}"
-                //];
-                //var fundoFiltro = game.add.sprite();
-                //fundoFiltro.width = 1280;
-                //fundoFiltro.height = 720;
-                //filtro = new Phaser.Filter(game, null, fragmentSrc);
-                //filtro.setResolution(1280, 720);
-                //filtro.alpha = 0.2;
-                //fundoFiltro.filters = [ filtro ];
+                var fragmentSrc = [
+                    "precision mediump float;",
+                    "#define N 3",
+                    "uniform float time;",
+                    "uniform vec2 mouse;",
+                    "uniform vec2 resolution;",
+                    "uniform sampler2D tex0;",
+                    "float plasma(vec2 u) {",
+                      "vec2 p = u;",
+                      "float t = time * 2.4;",
+                      "float r = 0.0;",
+                      "for (int i = 0; i < N; i++) {",
+                        "float d = 3.14159265 * float(i) * 5.0 / float(N);",
+                        "r = 0.75 * length(p) + 0.01;",
+                        "float a = atan(p.x,p.y)*4.;",
+                        "float xx = p.x;",
+                        "p.x += cos(p.y+sin(r*1.3+time) + d + r ) + cos(t*2.+r);",
+                        "p.y -= sin(xx +cos(r*2.3+a) - d + r + time*2.) + sin(t-r*2.);",
+                      "}",
+                      "return (r / 36.0) - 0.3;",
+                    "}",
+                    "void main(void) {",
+                      "vec2 uv = gl_FragCoord.xy;",
+                      "uv.x -= resolution.x * 0.5;",
+                      "uv = uv / resolution.xy * 40.0;",
+                      "uv.x /= 1.5;",
+                      "uv.y += 20.0;",
+
+                      "float c = plasma (uv);",
+                      "vec2 coord = (gl_FragCoord.xy / resolution.xy) + (0.15 * c);",
+                      "coord.y *= 0.5;",
+                      "coord.y += time * 0.02;",
+                      "if (coord.y <= 0.0) { coord.y = -coord.y; } else {",
+                      "coord.y = mod(coord.y, 2.0);",
+                      "if (coord.y > 1.0) coord.y = 2.0 - coord.y; }",
+
+                      "float f = (((resolution.y - gl_FragCoord.y) / resolution.y) + 0.2) * 1.25;", 
+                      "if (coord.x < 0.0) coord.x = -coord.x;",
+                      "else if (coord.x > 1.0) coord.x = 2.0 - coord.x;",
+                      "float r = clamp((c * f),0.0,1.0);",
+                      "r = clamp(((r - 0.5) * 2.5) + 0.5, 0.0, 1.0);",
+                      "gl_FragColor = vec4(texture2D(tex0, coord)) + vec4(r, r, r, 0.0);",
+                    "}"
+                ];
+                var uniforms = {
+                    tex0: { type: "sampler2D", value: fundo.texture, textureData: { repeat: true } }
+                };
+                filtro = new Phaser.Filter(game, uniforms, fragmentSrc);
+                filtro.setResolution(1280, 720);
+                fundo.filters = [ filtro ];
                 
                 ilha = game.add.tileSprite(0,0,1280,1440,'ilha');
 
@@ -366,7 +385,7 @@
 
             this.update = function() {
 
-                //filtro.update();
+                filtro.update();
                 
                 var lista = pedras.getAll('exists', true);
                 for (var i = 0; i < lista.length; i++) {
@@ -418,7 +437,7 @@
 
 
                 //Move o fundo
-                fundo.tilePosition.y += 2;
+                //fundo.tilePosition.y += 2;
                 ilha.tilePosition.y += 2;
             }
 
@@ -586,7 +605,7 @@
                     vida.kill();
                 }
 
-                if (vidas.countLiving() < 1) {
+                if (vidas.countLiving() < 1 && !botaoMenu.visible) {
                     barco.kill();
                     pedras.callAll('kill');
                     barcoInimigo.callAll('kill');
