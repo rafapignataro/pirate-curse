@@ -71,7 +71,7 @@
         var cursors;
         var atira;
         var barcoInimigo;
-        
+
         //Variaveis aceleracao
         var aceleracaoMover = 1250, aceleracaoParar = 1750;
 
@@ -170,9 +170,9 @@
                 game.load.image('pedra', 'Sprites/pedra1.png');
 
                 //Sprites mapa
-                game.load.spritesheet('waterP', 'Sprites/marLoop.jpg', 1280, 1440);
-                game.load.spritesheet('ilha', 'Sprites/ilhazinha.png',1280,1440);
-                game.load.image('parede', 'Sprites/Colisor.png');
+                game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560,1440);
+                game.load.spritesheet('ilha', 'Sprites/ilhazinha2.png',1280,1080);
+                game.load.image('parede', 'Sprites/Colisor2.png');
 
                 game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('pedra2', 'Sprites/pedra2.png');
@@ -197,59 +197,59 @@
                 fundo.width = 1280;
                 fundo.height = 720;
                 //fundo.visible = false;
-                
-                var fragmentSrc = [
-                    "precision mediump float;",
-                    "#define N 3",
-                    "uniform float time;",
-                    "uniform vec2 mouse;",
-                    "uniform vec2 resolution;",
-                    "uniform sampler2D tex0;",
-                    "float plasma(vec2 u) {",
-                      "vec2 p = u;",
-                      "float t = time * 2.4;",
-                      "float r = 0.0;",
-                      "for (int i = 0; i < N; i++) {",
-                        "float d = 3.14159265 * float(i) * 5.0 / float(N);",
-                        "r = 0.75 * length(p) + 0.01;",
-                        "float a = atan(p.x,p.y)*4.;",
-                        "float xx = p.x;",
-                        "p.x += cos(p.y+sin(r*1.3+time) + d + r ) + cos(t*2.+r);",
-                        "p.y -= sin(xx +cos(r*2.3+a) - d + r + time*2.) + sin(t-r*2.);",
-                      "}",
-                      "return (r / 36.0) - 0.3;",
-                    "}",
-                    "void main(void) {",
-                      "vec2 uv = gl_FragCoord.xy;",
-                      "uv.x -= resolution.x * 0.5;",
-                      "uv = uv / resolution.xy * 40.0;",
-                      "uv.x /= 1.5;",
-                      "uv.y += 20.0;",
 
-                      "float c = plasma (uv);",
-                      "vec2 coord = (gl_FragCoord.xy / resolution.xy) + (0.15 * c);",
-                      "coord.y *= 0.5;",
-                      "coord.y += time * 0.02;",
-                      "if (coord.y <= 0.0) { coord.y = -coord.y; } else {",
-                      "coord.y = mod(coord.y, 2.0);",
-                      "if (coord.y > 1.0) coord.y = 2.0 - coord.y; }",
+                // var fragmentSrc = [
+                //     "precision mediump float;",
+                //     "#define N 3",
+                //     "uniform float time;",
+                //     "uniform vec2 mouse;",
+                //     "uniform vec2 resolution;",
+                //     "uniform sampler2D tex0;",
+                //     "float plasma(vec2 u) {",
+                //       "vec2 p = u;",
+                //       "float t = time * 2.4;",
+                //       "float r = 0.0;",
+                //       "for (int i = 0; i < N; i++) {",
+                //         "float d = 3.14159265 * float(i) * 5.0 / float(N);",
+                //         "r = 0.75 * length(p) + 0.01;",
+                //         "float a = atan(p.x,p.y)*4.;",
+                //         "float xx = p.x;",
+                //         "p.x += cos(p.y+sin(r*1.3+time) + d + r ) + cos(t*2.+r);",
+                //         "p.y -= sin(xx +cos(r*2.3+a) - d + r + time*2.) + sin(t-r*2.);",
+                //       "}",
+                //       "return (r / 36.0) - 0.3;",
+                //     "}",
+                //     "void main(void) {",
+                //       "vec2 uv = gl_FragCoord.xy;",
+                //       "uv.x -= resolution.x * 0.5;",
+                //       "uv = uv / resolution.xy * 40.0;",
+                //       "uv.x /= 1.5;",
+                //       "uv.y += 20.0;",
+                //
+                //       "float c = plasma (uv);",
+                //       "vec2 coord = (gl_FragCoord.xy / resolution.xy) + (0.15 * c);",
+                //       "coord.y *= 0.5;",
+                //       "coord.y += time * 0.02;",
+                //       "if (coord.y <= 0.0) { coord.y = -coord.y; } else {",
+                //       "coord.y = mod(coord.y, 2.0);",
+                //       "if (coord.y > 1.0) coord.y = 2.0 - coord.y; }",
+                //
+                //       "float f = (((resolution.y - gl_FragCoord.y) / resolution.y) + 0.2) * 1.25;",
+                //       "if (coord.x < 0.0) coord.x = -coord.x;",
+                //       "else if (coord.x > 1.0) coord.x = 2.0 - coord.x;",
+                //       "float r = clamp((c * f),0.0,1.0);",
+                //       "r = clamp(((r - 0.5) * 2.5) + 0.5, 0.0, 1.0);",
+                //       "gl_FragColor = vec4(texture2D(tex0, coord)) + vec4(r, r, r, 0.0);",
+                //     "}"
+                // ];
+                // var uniforms = {
+                //     tex0: { type: "sampler2D", value: fundo.texture, textureData: { repeat: true } }
+                // };
+                // filtro = new Phaser.Filter(game, uniforms, fragmentSrc);
+                // filtro.setResolution(1280, 720);
+                // fundo.filters = [ filtro ];
 
-                      "float f = (((resolution.y - gl_FragCoord.y) / resolution.y) + 0.2) * 1.25;", 
-                      "if (coord.x < 0.0) coord.x = -coord.x;",
-                      "else if (coord.x > 1.0) coord.x = 2.0 - coord.x;",
-                      "float r = clamp((c * f),0.0,1.0);",
-                      "r = clamp(((r - 0.5) * 2.5) + 0.5, 0.0, 1.0);",
-                      "gl_FragColor = vec4(texture2D(tex0, coord)) + vec4(r, r, r, 0.0);",
-                    "}"
-                ];
-                var uniforms = {
-                    tex0: { type: "sampler2D", value: fundo.texture, textureData: { repeat: true } }
-                };
-                filtro = new Phaser.Filter(game, uniforms, fragmentSrc);
-                filtro.setResolution(1280, 720);
-                fundo.filters = [ filtro ];
-                
-                ilha = game.add.tileSprite(0,0,1280,1440,'ilha');
+                ilha = game.add.tileSprite(0,0,1280,1080,'ilha');
 
                 //PEDRAS
                 pedras = game.add.group();
@@ -261,7 +261,7 @@
 
                 //Parede invisivel laterais
                 parede = game.add.sprite(0,0, 'parede');
-                parede2 = game.add.sprite(980,0, 'parede');
+                parede2 = game.add.sprite(1225,0, 'parede');
                 game.physics.enable(parede, Phaser.Physics.ARCADE);
                 game.physics.enable(parede2, Phaser.Physics.ARCADE);
                 parede.body.enable = true;
@@ -278,7 +278,7 @@
                 aguaBarco.anchor.setTo(0.5, 0.5);
                 aguaBarco.animations.add("movimento", [0, 1, 2, 3, 4], 12, true);
                 aguaBarco.animations.play("movimento");
-                
+
                 //BARCO
                 barco = game.add.sprite(640, 600, 'ship');
                 game.physics.arcade.enable(barco);
@@ -385,8 +385,8 @@
 
             this.update = function() {
 
-                filtro.update();
-                
+                // filtro.update();
+
                 var lista = pedras.getAll('exists', true);
                 for (var i = 0; i < lista.length; i++) {
                     if (lista[i].body.y > 300) {
@@ -415,6 +415,9 @@
                 game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
 
                 game.physics.arcade.overlap(balas, pedras, collisionHandler3, null, this);
+                game.physics.arcade.overlap(balasInimigas, pedras, collisionHandler3, null, this);
+                game.physics.arcade.overlap(barcoInimigo, pedras, collisionHandler4, null, this);
+                game.physics.arcade.overlap(balas, balasInimigas, collisionHandler5, null, this);
 
                 ajustaVelocidadeBarco();
 
@@ -437,7 +440,8 @@
 
 
                 //Move o fundo
-                //fundo.tilePosition.y += 2;
+                fundo.tilePosition.y += 2;
+                fundo.tilePosition.x += 0.5;
                 ilha.tilePosition.y += 2;
             }
 
@@ -483,7 +487,7 @@
                 barco.body.velocidadeAntigaX = v;
                 barco.body.velocity.x = v;
                 barco.body.acceleration.x = a;
-                
+
                 var a = 0;
                 var v = barco.body.velocity.y;
                 if (cursors.up.isDown) {
@@ -523,10 +527,10 @@
                 }
                 barco.body.velocidadeAntigaY = v;
                 barco.body.velocity.y = v;
-                barco.body.acceleration.y = a;                
+                barco.body.acceleration.y = a;
             }
-            
-            
+
+
             function contaDistancia() {
 
                 distancia++;
@@ -547,13 +551,13 @@
                 var barcoinimigo = barcoInimigo.getRandomNotExists();
 
                 if(!barcoinimigo){
-                    barcoinimigo = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'barcoinimigo');
+                    barcoinimigo = pedras.create(Math.random() * (900 - 272) + 272, -100, 'barcoinimigo');
                     barcoinimigo.outOfBoundsKill = false;
                     barcoinimigo.checkWorldBounds = false;
                 } else {
                     barcoinimigo.outOfBoundsKill = false;
                     barcoinimigo.checkWorldBounds = false;
-                    barcoinimigo.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                    barcoinimigo.reset(Math.random() * (900 - 272) + 272, -100);
                 }
                 barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
                 barcoinimigo.body.enable = true;
@@ -567,13 +571,13 @@
 
                 var pedra = pedras.getRandomNotExists();
                 if (!pedra) {
-                    pedra = pedras.create(Math.random() * (900 - 362.5) + 362.5, -100, 'pedra');
+                    pedra = pedras.create(Math.random() * (900 - 272) + 272, -100, 'pedra');
                     pedra.outOfBoundsKill = false;
                     pedra.checkWorldBounds = false;
                 } else {
                     pedra.outOfBoundsKill = false;
                     pedra.checkWorldBounds = false;
-                    pedra.reset(Math.random() * (900 - 362.5) + 362.5, -100);
+                    pedra.reset(Math.random() * (900 - 272) + 272, -100);
                 }
                 pedra.physicsBodyType = Phaser.Physics.ARCADE;
                 pedra.body.enable = true;
@@ -643,6 +647,20 @@
                 bala.kill();
             }
 
+            function collisionHandler4(barcoInimigo, objetoColidido) {
+                barcoInimigo.kill();
+
+                var explosao = explosoes.getFirstExists(false);
+                explosao.reset(barcoInimigo.body.x, barcoInimigo.body.y);
+                explosao.animations.add('explode');
+                explosao.play('explode', 180, false, true);
+            }
+
+            function collisionHandler5(bala, balaInimiga) {
+                bala.kill();
+                balaInimiga.kill();
+            }
+
             function fire() {
 
                 if (game.time.now > bulletTime) {
@@ -652,9 +670,9 @@
                     if (bala) {
                         //  And fire it
                         bala.reset(barco.x, barco.y - 57);
-                        bala.body.velocity.y = -600;
+                        bala.body.velocity.y = -525;
                         bulletTime = game.time.now + 25;
-                        bala.scale.setTo(0.3, 0.3);
+                        bala.scale.setTo(0.32, 0.32);
                     }
                 }
 
@@ -749,16 +767,18 @@
                 game.load.crossOrigin = "anonymous";
 
                 game.load.image('tela','Sprites/srcoutoo.jpg',1280,720);
-                game.load.spritesheet('btnPlay', 'Sprites/play.jpg');
-                game.load.spritesheet('btnPlayOver', 'Sprites/playOver.jpg');
-                game.load.spritesheet('btnLoja', 'Sprites/loja.jpg');
-                game.load.spritesheet('btnLojaOver', 'Sprites/LojaOver.jpg');
+                game.load.spritesheet('btnPlay', 'Sprites/BotaoPlay.png');
+                game.load.spritesheet('btnPlayOver', 'Sprites/BotaoPlayHover.png');
+                game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
+                game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
                 game.load.image('engrenagem','Sprites/engrena.png');
 
             }
 
             var btnPlay;
             var btnLoja;
+            var btnPlayOver;
+            var btnLojaOver;
             var fundo;
             var engrenagem;
 
@@ -766,11 +786,11 @@
 
                 fundo = game.add.tileSprite(0,0,1280,720, 'tela');
 
-                btnPlay = game.add.image(300,600, 'btnPlay');
-                btnPlay.scale.setTo(1.2,1.2);
+                btnPlay = game.add.image(450,550, 'btnPlay');
+                btnPlay.scale.setTo(0.666,0.666);
 
-                btnLoja = game.add.image(700,600, 'btnLoja');
-                btnLoja.scale.setTo(1.2,1.2);
+                btnLoja = game.add.image(675,550, 'btnLoja');
+                btnLoja.scale.setTo(0.666,0.666);
 
                 btnPlay.inputEnabled = true;
                 btnPlay.events.onInputDown.add(clica, this);
@@ -792,23 +812,23 @@
             }
 
             function clicaOverPlay(){
-                btnPlay = game.add.image(300,600, 'btnPlayOver');
-                btnPlay.scale.setTo(1.2,1.2);
+                btnPlayOver = game.add.image(450,550, 'btnPlayOver');
+                btnPlayOver.scale.setTo(0.666,0.666);
             }
 
             function clicaOverLoja(){
-                btnLoja = game.add.image(700,600, 'btnLojaOver');
-                btnLoja.scale.setTo(1.2,1.2);
+                btnLojaOver = game.add.image(675,550, 'btnLojaOver');
+                btnLojaOver.scale.setTo(0.666,0.666);
             }
 
             function clicaOutPlay(){
-                btnLoja = game.add.image(300,600, 'btnPlay');
-                btnLoja.scale.setTo(1.2,1.2);
+                btnLoja.scale.setTo(0.666,0.666);
+                btnPlayOver.kill();
             }
 
             function clicaOutLoja(){
-                btnLoja = game.add.image(700,600, 'btnLoja');
-                btnLoja.scale.setTo(1.2,1.2);
+                btnLoja.scale.setTo(0.666,0.666);
+                btnLojaOver.kill();
             }
 
 
