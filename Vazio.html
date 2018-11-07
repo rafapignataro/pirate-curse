@@ -124,7 +124,9 @@
         var liberaAtirar = true;
 
         var botaoMenu;
-
+        var menuImage;
+        var btnMenu;
+        var btnRestart;
 
         function TelaInicial(game) {
 
@@ -177,9 +179,13 @@
                 game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('pedra2', 'Sprites/pedra2.png');
                 game.load.image('pedra3', 'Sprites/pedra3.png');
-
+                
+                game.load.image('telaScore', 'Sprites/telaScore.png')
                 game.load.image('menu', 'Sprites/menu.jpg');
                 game.load.image('menuOver', 'Sprites/menuOver.jpg');
+                game.load.image('btnMenu', 'Sprites/menuButton.png');
+                game.load.image('btnRestart', 'Sprites/restartButton.png');
+                
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
@@ -318,14 +324,42 @@
                 balasInimigas.setAll('anchor.y', 0.5);
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
-
-                botaoMenu = game.add.image(540,450, 'menu');
-                botaoMenu.scale.setTo(1.2);
-                botaoMenu.visible = false;
-                botaoMenu.inputEnabled = true;
-                botaoMenu.events.onInputDown.add(clica, this);
-                botaoMenu.events.onInputOver.add(clicaOverMenu, this);
-                botaoMenu.events.onInputOut.add(clicaOutPlay, this);
+                
+                
+                btnMenu = game.add.sprite(0, -100, 'btnMenu');
+                btnMenu.scale.setTo(0.7);
+                btnMenu.visible = false;
+                btnMenu.inputEnabled = true;
+                btnMenu.events.onInputDown.add(backToMenu, this);
+                btnMenu.events.onInputOver.add(mouseOverBtnMenu, this);
+                btnMenu.events.onInputOut.add(mouseOutBtnMenu, this);
+                btnMenu.alpha = 0.4;
+                
+                
+                btnRestart = game.add.sprite(350,200, 'btnRestart');
+                btnRestart.scale.setTo(0.7);
+                btnRestart.visible = false;
+                btnRestart.inputEnabled = true;
+                btnRestart.events.onInputDown.add(restart, this);
+                btnRestart.events.onInputOver.add(mouseOverBtnRestart, this);
+                btnRestart.events.onInputOut.add(mouseOutBtnRestart, this);
+                btnRestart.alpha = 0.4;
+                
+                
+                menuImage = game.add.image(350,50,'telaScore');
+                menuImage.scale.setTo(0.7);
+                menuImage.visible = false;
+                
+                
+                //botaoMenu = game.add.image(540,450, 'menu');
+                //botaoMenu.scale.setTo(1.2);
+                //botaoMenu.visible = false;
+                //botaoMenu.inputEnabled = true;
+                //botaoMenu.events.onInputDown.add(backToMenu, this);
+                //botaoMenu.events.onInputOver.add(clicaOverMenu, this);
+                //botaoMenu.events.onInputOut.add(clicaOutPlay, this);
+                      
+                
                 //CORAÇÕES
                 vidas = game.add.group();
                 for (var i = 0; i < 3; i++) {
@@ -353,14 +387,12 @@
                 });
 
 
-                textoFim = game.add.text(game.world.centerX, game.world.centerY, ' ', {
-                    font: '84px Indie Flower',
+                textoFim = game.add.text(game.world.centerX, game.world.centerY + 35, ' ', {
+                    font: '70px Indie Flower',
                     fill: '#fff'
                 });
                 textoFim.anchor.setTo(0.5, 0.5);
                 textoFim.visible = false;
-
-
 
                 //TECLADO
                 cursors = game.input.keyboard.createCursorKeys();
@@ -369,19 +401,40 @@
                 restart();
             }
 
-            function clica() {
+            function backToMenu() {
+                
                 game.state.start("TelaMenu");
             }
-
-            function clicaOverMenu(){
-                botaoMenu = game.add.image(540,450, 'menuOver');
-                botaoMenu.scale.setTo(1.2,1.2);
+            
+            function mouseOverBtnMenu () {
+                
+                btnMenu.alpha = 1;
+            }
+            
+            function mouseOverBtnRestart (){
+                
+                btnRestart.alpha = 1;
+            }
+            
+            function mouseOutBtnMenu () {
+                
+                btnMenu.alpha = 0.4;
+            }
+            
+            function mouseOutBtnRestart (){
+                
+                btnRestart.alpha = 0.4;
             }
 
-            function clicaOutPlay(){
-                botaoMenu = game.add.image(540,450, 'menu');
-                botaoMenu.scale.setTo(1.2,1.2);
-            }
+           // function clicaOverMenu(){
+           //     botaoMenu = game.add.image(540,450, 'menuOver');
+           //     botaoMenu.scale.setTo(1.2,1.2);
+           // }
+           //
+           // function clicaOutPlay(){
+           //     botaoMenu = game.add.image(540,450, 'menu');
+           //     botaoMenu.scale.setTo(1.2,1.2);
+           // }
 
             this.update = function() {
 
@@ -609,7 +662,8 @@
                     vida.kill();
                 }
 
-                if (vidas.countLiving() < 1 && !botaoMenu.visible) {
+                if (vidas.countLiving() < 1) {
+                    
                     barco.kill();
                     pedras.callAll('kill');
                     barcoInimigo.callAll('kill');
@@ -619,11 +673,15 @@
                     game.time.events.remove(loopBarIni);
                     game.time.events.remove(loopDist);
 
-                    textoFim.text = "  Você navegou por: \n" + "         " + distancia + " Metros";
+                    textoFim.text = distancia;
                     textoFim.visible = true;
-                    game.input.onTap.addOnce(restart, this);
+                    
+                    btnMenu.visible = true;
+                    btnRestart.visible = true;
+                    menuImage.visible = true;
+                    
 
-                    botaoMenu.visible = true;
+                    //botaoMenu.visible = true;
                 }
                 var explosao = explosoes.getFirstExists(false);
                 explosao.reset(barco.body.x, barco.body.y);
@@ -714,7 +772,10 @@
                 barco.revive();
                 //esconde o texto
                 textoFim.visible = false;
-                botaoMenu.visible = false;
+                //botaoMenu.visible = false;
+                menuImage.visible = false;
+                btnMenu.visible = false;
+                btnRestart.visible = false;
 
                 distancia = 0;
                 InimigosMortos = 0;
