@@ -9,3 +9,14 @@ canvas {
     display: block;
     margin: 0 auto;
 }
+
+@font-face{
+	font-family: 'All+the+Way+to+the+Sun';
+	src: url('All the Way to the Sun.ttf');
+}
+
+.hidden{
+	font-family: 'All+the+Way+to+the+Sun';
+	visibility: hidden;
+	position: absolute;
+}

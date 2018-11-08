@@ -16,14 +16,26 @@
             margin: 0;
             color: #fff;
             font: normal 14px sans-serif;
+            background-color: #800000;
         }
 
         canvas {
             display: block;
-            margin: 0 auto;
+            margin: 0 auto; 
+        }
+        
+        @font-face{
+	        font-family: 'Sun';
+	        src: url('Sun.ttf');
+        }
 
+        .hidden{
+	        font-family: 'Sun';
+	        visibility: hidden;
+	        position: absolute;
         }
     </style>
+
 </head>
 
 <body>
@@ -86,7 +98,7 @@
 
         //Variaveis mecanica bala
         var bulletTime = 0;
-        var fireInterval = 200;
+        var fireInterval = 350;
         var timeUltimoTiro = 0;
         var nextFire = 0;
 
@@ -133,6 +145,7 @@
         function TelaInicial(game) {
 
             // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
+            // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
             this.init = function() {
 
                 game.input.maxPointers = 1;
@@ -168,26 +181,29 @@
                 game.load.image('barcoinimigo', 'Sprites/BarcoInimigo.png')
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
                 game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
-                game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
                 game.load.image('coracao', 'Sprites/heart.png');
-
                 game.load.image('pedra', 'Sprites/pedra1.png');
-
+                game.load.image('pedra2', 'Sprites/pedra2.png');
+                game.load.image('pedra3', 'Sprites/pedra3.png');
+                
+                //ANIMAÇÕES
+                game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
+                
                 //Sprites mapa
                 game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560,1440);
                 game.load.spritesheet('ilha', 'Sprites/ilhazinha2.png',1280,1080);
                 game.load.image('parede', 'Sprites/Colisor2.png');
-
-                game.load.image('pedra', 'Sprites/pedra1.png');
-                game.load.image('pedra2', 'Sprites/pedra2.png');
-                game.load.image('pedra3', 'Sprites/pedra3.png');
-
+                
+                //MENU IN GAME
                 game.load.image('telaScore', 'Sprites/telaScore.png');
                 game.load.image('btnMenu', 'Sprites/btnHighLight.png');
+                
+                //AUDIOS
+                game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
-                game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
+                
 
 
 
@@ -376,18 +392,20 @@
                 explosoes = game.add.group();
                 explosoes.createMultiple(30, 'explode');
 
-                textoDistancia = game.add.text(10, 10, 'Distance: ', {
-                    font: "40px arial",
-                    fill: "#ffffff",
-                    backgroundColor: "#34495e",
-                    padding: "20px"
+                textoDistancia = game.add.text(10, 10, '', {
+                    font: '65px Sun',
+                    fill: "#ecd781",
+                    padding: "20px",
+                    letterspacing: "200px" 
                 });
-                textoInimigos = game.add.text(10, 60, 'Inimigos: 0', {
-                    font: "40px arial",
-                    fill: "#ffffff",
-                    backgroundColor: "#34495e",
-                    padding: "20px"
-                });
+                textoDistancia.stroke = "#000000";
+                textoDistancia.strokeThickness = 6;
+                //textoInimigos = game.add.text(10, 60, 'Inimigos: 0', {
+                //    font: "40px arial",
+                //    fill: "#ffffff",
+                //    backgroundColor: "#34495e",
+                //    padding: "20px"
+                //});
 
 
                 textoFim = game.add.text(game.world.centerX, game.world.centerY + 35, ' ', {
@@ -593,14 +611,14 @@
 
                 distancia++;
 
-                textoDistancia.setText('Distancia: ' + distancia);
+                textoDistancia.setText(distancia + "m");
 
             }
 
             function contaInimigos() {
 
                 InimigosMortos++;
-                textoInimigos.setText('Inimigos: ' + InimigosMortos);
+                //textoInimigos.setText('Inimigos: ' + InimigosMortos);
             }
 
 
@@ -784,7 +802,7 @@
 
                 distancia = 0;
                 InimigosMortos = 0;
-                textoInimigos.text = "Inimigos: " + 0;
+                //textoInimigos.text = "Inimigos: " + 0;
                 loopPedras = game.time.events.loop(2000, liberaPedras, this);
                 loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
                 loopDist = game.time.events.loop(100, contaDistancia, this);
