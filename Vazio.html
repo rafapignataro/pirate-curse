@@ -21,19 +21,20 @@
 
         canvas {
             display: block;
-            margin: 0 auto; 
-        }
-        
-        @font-face{
-	        font-family: 'Sun';
-	        src: url('Sun.ttf');
+            margin: 0 auto;
         }
 
-        .hidden{
-	        font-family: 'Sun';
-	        visibility: hidden;
-	        position: absolute;
+        @font-face {
+            font-family: 'Sun';
+            src: url('Sun.ttf');
         }
+
+        .hidden {
+            font-family: 'Sun';
+            visibility: hidden;
+            position: absolute;
+        }
+
     </style>
 
 </head>
@@ -53,21 +54,21 @@
             //  We set a 1 second delay before calling 'createText'.
             //  For some reason if we don't the browser cannot render the text the first time it's created.
             active: function() {
-                setTimeout(function () {
+                setTimeout(function() {
                     game.state.start("TelaMenu");
                 }, 1000);
             },
 
             //  The Google Fonts we want to load (specify as many as you like in the array)
             google: {
-              families: ['Indie+Flower']
+                families: ['Indie+Flower']
             }
 
         };
 
 
         // https://github.com/photonstorm/phaser/blob/v2.6.2/src/core/Group.js#L2372
-        Phaser.Group.prototype.getRandomNotExists = function (startIndex, endIndex) {
+        Phaser.Group.prototype.getRandomNotExists = function(startIndex, endIndex) {
             var list = this.getAll('exists', false, startIndex, endIndex);
             return this.game.rnd.pick(list);
         };
@@ -85,7 +86,8 @@
         var barcoInimigo;
 
         //Variaveis aceleracao
-        var aceleracaoMover = 1250, aceleracaoParar = 1750;
+        var aceleracaoMover = 1250,
+            aceleracaoParar = 1750;
 
         //Variaveis background
         var fundo;
@@ -185,25 +187,25 @@
                 game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('pedra2', 'Sprites/pedra2.png');
                 game.load.image('pedra3', 'Sprites/pedra3.png');
-                
+
                 //ANIMAÇÕES
                 game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
-                
+
                 //Sprites mapa
-                game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560,1440);
-                game.load.spritesheet('ilha', 'Sprites/ilhazinha2.png',1280,1080);
+                game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560, 1440);
+                game.load.spritesheet('ilha', 'Sprites/ilhazinha2.png', 1280, 1080);
                 game.load.image('parede', 'Sprites/Colisor2.png');
-                
+
                 //MENU IN GAME
                 game.load.image('telaScore', 'Sprites/telaScore.png');
                 game.load.image('btnMenu', 'Sprites/btnHighLight.png');
-                
+
                 //AUDIOS
                 game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
-                
+
 
 
 
@@ -272,7 +274,7 @@
                 // filtro.setResolution(1280, 720);
                 // fundo.filters = [ filtro ];
 
-                ilha = game.add.tileSprite(0,0,1280,1080,'ilha');
+                ilha = game.add.tileSprite(0, 0, 1280, 1080, 'ilha');
                 explosion = game.add.audio('explosion');
 
                 //PEDRAS
@@ -284,8 +286,8 @@
                 game.physics.arcade.enable(pedras, true);
 
                 //Parede invisivel laterais
-                parede = game.add.sprite(0,0, 'parede');
-                parede2 = game.add.sprite(1225,0, 'parede');
+                parede = game.add.sprite(0, 0, 'parede');
+                parede2 = game.add.sprite(1225, 0, 'parede');
                 game.physics.enable(parede, Phaser.Physics.ARCADE);
                 game.physics.enable(parede2, Phaser.Physics.ARCADE);
                 parede.body.enable = true;
@@ -343,11 +345,11 @@
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
 
-                menuImage = game.add.image(350,50,'telaScore');
+                menuImage = game.add.image(350, 50, 'telaScore');
                 menuImage.scale.setTo(0.7);
                 menuImage.visible = false;
 
-                btnMenu = game.add.sprite(570,197, 'btnMenu');
+                btnMenu = game.add.sprite(570, 197, 'btnMenu');
                 btnMenu.scale.setTo(0.7);
                 btnMenu.visible = false;
                 btnMenu.inputEnabled = true;
@@ -357,7 +359,7 @@
                 btnMenu.alpha = 0;
 
 
-                btnRestart = game.add.sprite(570,447, 'btnMenu');
+                btnRestart = game.add.sprite(570, 447, 'btnMenu');
                 btnRestart.scale.setTo(0.7);
                 btnRestart.visible = false;
                 btnRestart.inputEnabled = true;
@@ -396,7 +398,7 @@
                     font: '65px Sun',
                     fill: "#ecd781",
                     padding: "20px",
-                    letterspacing: "200px" 
+                    letterspacing: "200px"
                 });
                 textoDistancia.stroke = "#000000";
                 textoDistancia.strokeThickness = 6;
@@ -428,35 +430,35 @@
                 game.state.start("TelaMenu");
             }
 
-            function mouseOverBtnMenu () {
+            function mouseOverBtnMenu() {
 
                 btnMenu.alpha = 1;
             }
 
-            function mouseOverBtnRestart (){
+            function mouseOverBtnRestart() {
 
                 btnRestart.alpha = 1;
             }
 
-            function mouseOutBtnMenu () {
+            function mouseOutBtnMenu() {
 
                 btnMenu.alpha = 0.4;
             }
 
-            function mouseOutBtnRestart (){
+            function mouseOutBtnRestart() {
 
                 btnRestart.alpha = 0.4;
             }
 
-           // function clicaOverMenu(){
-           //     botaoMenu = game.add.image(540,450, 'menuOver');
-           //     botaoMenu.scale.setTo(1.2,1.2);
-           // }
-           //
-           // function clicaOutPlay(){
-           //     botaoMenu = game.add.image(540,450, 'menu');
-           //     botaoMenu.scale.setTo(1.2,1.2);
-           // }
+            // function clicaOverMenu(){
+            //     botaoMenu = game.add.image(540,450, 'menuOver');
+            //     botaoMenu.scale.setTo(1.2,1.2);
+            // }
+            //
+            // function clicaOutPlay(){
+            //     botaoMenu = game.add.image(540,450, 'menu');
+            //     botaoMenu.scale.setTo(1.2,1.2);
+            // }
 
             this.update = function() {
 
@@ -478,7 +480,7 @@
                     }
                 }
 
-                game.physics.arcade.collide(barco, [parede,parede2]);
+                game.physics.arcade.collide(barco, [parede, parede2]);
 
                 tipoVerificacao = 0;
                 game.physics.arcade.overlap(barco, pedras, collisionHandler, null, this);
@@ -626,7 +628,7 @@
 
                 var barcoinimigo = barcoInimigo.getRandomNotExists();
 
-                if(!barcoinimigo){
+                if (!barcoinimigo) {
                     barcoinimigo = pedras.create(Math.random() * (900 - 272) + 272, -100, 'barcoinimigo');
                     barcoinimigo.outOfBoundsKill = false;
                     barcoinimigo.checkWorldBounds = false;
@@ -665,11 +667,11 @@
 
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(140 * 0.25, 250, 250);
-                }else if (pedra.key == 'pedra2') {
+                } else if (pedra.key == 'pedra2') {
 
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(140 * 0.25, 250, 250);
-                }else if(pedra.key == 'pedra3'){
+                } else if (pedra.key == 'pedra3') {
 
                     pedra.scale.setTo(0.25, 0.25);
                     pedra.body.setCircle(80 * 0.25, 250, 250);
@@ -818,7 +820,7 @@
 
         }
 
-        function TelaMenu(game){
+        function TelaMenu(game) {
 
             // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
             this.init = function() {
@@ -850,12 +852,12 @@
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
 
-                game.load.image('tela','Sprites/srcoutoo.jpg',1280,720);
+                game.load.image('tela', 'Sprites/fundo.jpg', 1280, 720);
                 game.load.spritesheet('btnPlay', 'Sprites/BotaoPlay.png');
                 game.load.spritesheet('btnPlayOver', 'Sprites/BotaoPlayHover.png');
                 game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
                 game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
-                game.load.image('engrenagem','Sprites/engrena.png');
+                game.load.image('tela2', 'Sprites/escritos.png');
 
             }
 
@@ -864,17 +866,25 @@
             var btnPlayOver;
             var btnLojaOver;
             var fundo;
-            var engrenagem;
+            
 
             this.create = function() {
 
-                fundo = game.add.tileSprite(0,0,1280,720, 'tela');
+                fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
+                fundo.scale.setTo(0.75, 0.75);
+                fundo.anchor.setTo(0.5, 0.5);
 
-                btnPlay = game.add.image(450,550, 'btnPlay');
-                btnPlay.scale.setTo(0.666,0.666);
+                game.physics.enable(fundo, Phaser.Physics.ARCADE);
 
-                btnLoja = game.add.image(675,550, 'btnLoja');
-                btnLoja.scale.setTo(0.666,0.666);
+                var tela2 = game.add.tileSprite(640, 330, 1920, 1080, 'tela2');
+                tela2.scale.setTo(0.75, 0.75);
+                tela2.anchor.setTo(0.5, 0.5);
+                
+                btnPlay = game.add.image(450, 550, 'btnPlay');
+                btnPlay.scale.setTo(0.666, 0.666);
+
+                btnLoja = game.add.image(675, 550, 'btnLoja');
+                btnLoja.scale.setTo(0.666, 0.666);
 
                 btnPlay.inputEnabled = true;
                 btnPlay.events.onInputDown.add(clica, this);
@@ -886,38 +896,37 @@
 
                 btnPlay.events.onInputOut.add(clicaOutPlay, this);
                 btnLoja.events.onInputOut.add(clicaOutLoja, this);
-
-                engrenagem = game.add.image(1180,0, 'engrenagem');
-                engrenagem.scale.setTo(0.1,0.1);
             }
 
-            function clica(){
+            function clica() {
                 game.state.start("TelaInicial");
             }
 
-            function clicaOverPlay(){
-                btnPlayOver = game.add.image(450,550, 'btnPlayOver');
-                btnPlayOver.scale.setTo(0.666,0.666);
+            function clicaOverPlay() {
+                btnPlayOver = game.add.image(450, 550, 'btnPlayOver');
+                btnPlayOver.scale.setTo(0.666, 0.666);
             }
 
-            function clicaOverLoja(){
-                btnLojaOver = game.add.image(675,550, 'btnLojaOver');
-                btnLojaOver.scale.setTo(0.666,0.666);
+            function clicaOverLoja() {
+                btnLojaOver = game.add.image(675, 550, 'btnLojaOver');
+                btnLojaOver.scale.setTo(0.666, 0.666);
             }
 
-            function clicaOutPlay(){
-                btnLoja.scale.setTo(0.666,0.666);
+            function clicaOutPlay() {
+                btnLoja.scale.setTo(0.666, 0.666);
                 btnPlayOver.kill();
             }
 
-            function clicaOutLoja(){
-                btnLoja.scale.setTo(0.666,0.666);
+            function clicaOutLoja() {
+                btnLoja.scale.setTo(0.666, 0.666);
                 btnLojaOver.kill();
             }
-
+            
+            var angle = 0.025;
 
             this.update = function() {
-
+                
+                fundo.angle = 4 * Math.sin(game.time.now * 0.0005) ;
             }
 
 
@@ -932,6 +941,7 @@
         game.state.add("TelaInicial", TelaInicial);
         game.state.add("TelaMenu", TelaMenu);
         //]]>
+
     </script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
 </body>
