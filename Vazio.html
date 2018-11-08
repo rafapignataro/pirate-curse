@@ -128,6 +128,8 @@
         var btnMenu;
         var btnRestart;
 
+        var explosion;
+
         function TelaInicial(game) {
 
             // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
@@ -179,16 +181,14 @@
                 game.load.image('pedra', 'Sprites/pedra1.png');
                 game.load.image('pedra2', 'Sprites/pedra2.png');
                 game.load.image('pedra3', 'Sprites/pedra3.png');
-                
-                game.load.image('telaScore', 'Sprites/telaScore.png')
+
+                game.load.image('telaScore', 'Sprites/telaScore.png');
                 game.load.image('btnMenu', 'Sprites/btnHighLight.png');
-                
-                
-                
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
-                
+                game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
+
 
 
             }
@@ -257,6 +257,7 @@
                 // fundo.filters = [ filtro ];
 
                 ilha = game.add.tileSprite(0,0,1280,1080,'ilha');
+                explosion = game.add.audio('explosion');
 
                 //PEDRAS
                 pedras = game.add.group();
@@ -325,11 +326,11 @@
                 balasInimigas.setAll('anchor.y', 0.5);
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
-                
+
                 menuImage = game.add.image(350,50,'telaScore');
                 menuImage.scale.setTo(0.7);
                 menuImage.visible = false;
-                
+
                 btnMenu = game.add.sprite(570,197, 'btnMenu');
                 btnMenu.scale.setTo(0.7);
                 btnMenu.visible = false;
@@ -338,8 +339,8 @@
                 btnMenu.events.onInputOver.add(mouseOverBtnMenu, this);
                 btnMenu.events.onInputOut.add(mouseOutBtnMenu, this);
                 btnMenu.alpha = 0;
-                
-                
+
+
                 btnRestart = game.add.sprite(570,447, 'btnMenu');
                 btnRestart.scale.setTo(0.7);
                 btnRestart.visible = false;
@@ -348,11 +349,11 @@
                 btnRestart.events.onInputOver.add(mouseOverBtnRestart, this);
                 btnRestart.events.onInputOut.add(mouseOutBtnRestart, this);
                 btnRestart.alpha = 0;
-                
-                
-                
-                
-                
+
+
+
+
+
                 //botaoMenu = game.add.image(540,450, 'menu');
                 //botaoMenu.scale.setTo(1.2);
                 //botaoMenu.visible = false;
@@ -360,8 +361,8 @@
                 //botaoMenu.events.onInputDown.add(backToMenu, this);
                 //botaoMenu.events.onInputOver.add(clicaOverMenu, this);
                 //botaoMenu.events.onInputOut.add(clicaOutPlay, this);
-                      
-                
+
+
                 //CORAÇÕES
                 vidas = game.add.group();
                 for (var i = 0; i < 3; i++) {
@@ -400,31 +401,32 @@
                 cursors = game.input.keyboard.createCursorKeys();
                 atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
+
                 restart();
             }
 
             function backToMenu() {
-                
+
                 game.state.start("TelaMenu");
             }
-            
+
             function mouseOverBtnMenu () {
-                
+
                 btnMenu.alpha = 1;
             }
-            
+
             function mouseOverBtnRestart (){
-                
+
                 btnRestart.alpha = 1;
             }
-            
+
             function mouseOutBtnMenu () {
-                
+
                 btnMenu.alpha = 0.4;
             }
-            
+
             function mouseOutBtnRestart (){
-                
+
                 btnRestart.alpha = 0.4;
             }
 
@@ -484,6 +486,7 @@
                         if (deltaT >= fireInterval) {
                             timeUltimoTiro = agora;
                             fire();
+                            explosion.play();
                         }
                     }
                 }
@@ -665,7 +668,7 @@
                 }
 
                 if (vidas.countLiving() < 1) {
-                    
+
                     barco.kill();
                     pedras.callAll('kill');
                     barcoInimigo.callAll('kill');
@@ -677,11 +680,11 @@
 
                     textoFim.text = distancia;
                     textoFim.visible = true;
-                    
+
                     btnMenu.visible = true;
                     btnRestart.visible = true;
                     menuImage.visible = true;
-                    
+
 
                     //botaoMenu.visible = true;
                 }
