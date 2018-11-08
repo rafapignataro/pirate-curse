@@ -181,14 +181,15 @@
                 game.load.image('pedra3', 'Sprites/pedra3.png');
                 
                 game.load.image('telaScore', 'Sprites/telaScore.png')
-                game.load.image('menu', 'Sprites/menu.jpg');
-                game.load.image('menuOver', 'Sprites/menuOver.jpg');
-                game.load.image('btnMenu', 'Sprites/menuButton.png');
-                game.load.image('btnRestart', 'Sprites/restartButton.png');
+                game.load.image('btnMenu', 'Sprites/btnHighLight.png');
+                
+                
                 
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
+                
+
 
             }
 
@@ -325,30 +326,31 @@
                 balasInimigas.setAll('outOfBoundsKill', true);
                 balasInimigas.setAll('checkWorldBounds', true);
                 
+                menuImage = game.add.image(350,50,'telaScore');
+                menuImage.scale.setTo(0.7);
+                menuImage.visible = false;
                 
-                btnMenu = game.add.sprite(0, -100, 'btnMenu');
+                btnMenu = game.add.sprite(570,197, 'btnMenu');
                 btnMenu.scale.setTo(0.7);
                 btnMenu.visible = false;
                 btnMenu.inputEnabled = true;
                 btnMenu.events.onInputDown.add(backToMenu, this);
                 btnMenu.events.onInputOver.add(mouseOverBtnMenu, this);
                 btnMenu.events.onInputOut.add(mouseOutBtnMenu, this);
-                btnMenu.alpha = 0.4;
+                btnMenu.alpha = 0;
                 
                 
-                btnRestart = game.add.sprite(350,200, 'btnRestart');
+                btnRestart = game.add.sprite(570,447, 'btnMenu');
                 btnRestart.scale.setTo(0.7);
                 btnRestart.visible = false;
                 btnRestart.inputEnabled = true;
                 btnRestart.events.onInputDown.add(restart, this);
                 btnRestart.events.onInputOver.add(mouseOverBtnRestart, this);
                 btnRestart.events.onInputOut.add(mouseOutBtnRestart, this);
-                btnRestart.alpha = 0.4;
+                btnRestart.alpha = 0;
                 
                 
-                menuImage = game.add.image(350,50,'telaScore');
-                menuImage.scale.setTo(0.7);
-                menuImage.visible = false;
+                
                 
                 
                 //botaoMenu = game.add.image(540,450, 'menu');
