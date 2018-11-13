@@ -143,6 +143,8 @@
         var btnRestart;
 
         var explosion;
+        
+        var musicaFundo
 
         function TelaInicial(game) {
 
@@ -178,7 +180,7 @@
             this.preload = function() {
                 game.load.crossOrigin = "anonymous";
 
-                game.load.image('ship', 'Sprites/Fragatinha.png');
+                game.load.image('ship', 'Sprites/fragatinha.png');
                 game.load.spritesheet('AguaMove', 'Sprites/WaterEffect.png', 158, 430);
                 game.load.image('barcoinimigo', 'Sprites/BarcoInimigo.png')
                 game.load.image('missil1', 'Sprites/cannon_ball.png');
@@ -202,12 +204,10 @@
 
                 //AUDIOS
                 game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
+                game.load.audio('music', 'Sons/musica.mp3');
 
                 //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
                 game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
-
-
-
 
             }
 
@@ -275,7 +275,7 @@
                 // fundo.filters = [ filtro ];
 
                 ilha = game.add.tileSprite(0, 0, 1280, 1080, 'ilha');
-                explosion = game.add.audio('explosion');
+                explosion = game.add.audio('explosion', 0.1);
 
                 //PEDRAS
                 pedras = game.add.group();
@@ -317,6 +317,7 @@
                 barco.addChild(aguaBarco);
                 barco.body.velocidadeAntigaX = 0;
                 barco.body.velocidadeAntigaY = 0;
+                
 
                 //Balas
                 balas = game.add.group();
@@ -368,7 +369,8 @@
                 btnRestart.events.onInputOut.add(mouseOutBtnRestart, this);
                 btnRestart.alpha = 0;
 
-
+                musicaFundo = game.add.audio('music', 0.4);
+                musicaFundo.play();
 
 
 
@@ -429,6 +431,7 @@
             function backToMenu() {
 
                 game.state.start("TelaMenu");
+                musicaFundo.stop();
             }
 
             function mouseOverBtnMenu() {
@@ -783,6 +786,7 @@
                     game.physics.arcade.moveToObject(balaInimiga, barco, 400);
                     balaInimiga.scale.setTo(0.4, 0.4);
                     firingTimer = game.time.now + 1300;
+                    explosion.play();
                 }
 
 
@@ -803,6 +807,8 @@
                 btnMenu.visible = false;
                 btnRestart.visible = false;
 
+                musicaFundo.play();
+                
                 distancia = 0;
                 InimigosMortos = 0;
                 //textoInimigos.text = "Inimigos: " + 0;
@@ -859,6 +865,10 @@
                 game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
                 game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
                 game.load.image('tela2', 'Sprites/escritos.png');
+                game.load.image('tela3', 'Sprites/texto.png');
+                
+                game.load.audio('barcoRangendo', 'Sons/ShipCreaking.mp3');
+                game.load.audio('somBotao', 'Sons/somBotao.mp3');
 
             }
 
@@ -868,8 +878,12 @@
             var btnLojaOver;
             var fundo;
             
+            var somBotao;
+            var somBarcoRangendo
 
             this.create = function() {
+                
+                
 
                 fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
                 fundo.scale.setTo(0.75, 0.75);
@@ -881,6 +895,10 @@
                 tela2.scale.setTo(0.75, 0.75);
                 tela2.anchor.setTo(0.5, 0.5);
                 
+                var tela3 = game.add.tileSprite(640, 320, 1920, 1080, 'tela3');
+                tela3.scale.setTo(0.75, 0.75);
+                tela3.anchor.setTo(0.5, 0.5);
+                
                 btnPlay = game.add.image(450, 550, 'btnPlay');
                 btnPlay.scale.setTo(0.666, 0.666);
 
@@ -891,16 +909,31 @@
                 btnPlay.events.onInputDown.add(clica, this);
 
                 btnLoja.inputEnabled = true;
+                btnLoja.events.onInputDown.add(goLoja, this);
 
                 btnPlay.events.onInputOver.add(clicaOverPlay, this);
                 btnLoja.events.onInputOver.add(clicaOverLoja, this);
 
                 btnPlay.events.onInputOut.add(clicaOutPlay, this);
                 btnLoja.events.onInputOut.add(clicaOutLoja, this);
+                
+                somBarcoRangendo = game.add.audio('barcoRangendo');
+                somBarcoRangendo.play();
+                
+                somBotao = game.add.audio('somBotao');
             }
 
             function clica() {
                 game.state.start("TelaInicial");
+                somBotao.play();
+                somBarcoRangendo.stop();
+            }
+            
+            function goLoja() {
+                
+                game.state.start("TelaLoja");
+                somBotao.play();
+                somBarcoRangendo.stop();
             }
 
             function clicaOverPlay() {
@@ -935,12 +968,72 @@
                 //game.debug.spriteBounds(barco);
             }
         }
+        
+        function TelaLoja(game) {
+            
+            // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
+            this.init = function() {
+
+                game.input.maxPointers = 1;
+
+                // Deixar o jogo executando, mesmo se o browser mudar de aba?
+                game.stage.disableVisibilityChange = false;
+
+                if (game.device.desktop) {
+                    // Configurações específicas para desktop
+
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                } else {
+                    // Configurações específicas para celulares
+
+                    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+                    // Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
+                    game.scale.setMinMax(400, 300, 1280, 720);
+                    game.scale.forceLandscape = true;
+                    // Como criamos o CSS acima, não precisamos centralizar via código
+                    game.scale.pageAlignHorizontally = false;
+                }
+
+            }
+            
+            var fundo;
+
+            this.preload = function() {
+                game.load.crossOrigin = "anonymous";
+                
+                game.load.image('fundo', 'Sprites/fundo.jpg');
+                
+
+            }
+
+            this.create = function() {
+
+                fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
+                fundo.scale.setTo(0.75, 0.75);
+                fundo.anchor.setTo(0.5, 0.5);
+                
+                
+                
+            }
+
+            this.update = function() {
+                
+                //fundo.angle = 4 * Math.sin(game.time.now * 0.0005) ;
+            }
+
+
+            this.render = function() {
+            }
+                        
+        }
         // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
         // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
         // dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
         // executar jogo.state.start("Nome da tela") a qualquer momento)
         game.state.add("TelaInicial", TelaInicial);
         game.state.add("TelaMenu", TelaMenu);
+        game.state.add("TelaLoja", TelaLoja)
         //]]>
 
     </script>
