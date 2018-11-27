@@ -143,7 +143,7 @@
   var btnRestart;
 
   var explosion;
-
+  var dist = 0.5;
   var musicaFundo
 
   function TelaInicial(game) {
@@ -209,16 +209,13 @@
 
       //game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/CheckerWave.js');
       game.load.script('filter', 'https://cdn.rawgit.com/photonstorm/phaser-ce/master/filters/Marble.js');
-
     }
-
 
     this.create = function() {
       game.stage.backgroundColor = "#3498db";
       game.physics.startSystem(Phaser.Physics.ARCADE);
 
       //AGUA
-
       fundo = game.add.tileSprite(0, 0, 1280, 1440, 'waterP');
       fundo.width = 1280;
       fundo.height = 720;
@@ -319,7 +316,6 @@
       barco.body.velocidadeAntigaX = 0;
       barco.body.velocidadeAntigaY = 0;
 
-
       //Balas
       balas = game.add.group();
       balas.enableBody = true;
@@ -359,7 +355,6 @@
       btnMenu.events.onInputOut.add(mouseOutBtnMenu, this);
       btnMenu.alpha = 0;
 
-
       btnRestart = game.add.sprite(570, 447, 'btnMenu');
       btnRestart.scale.setTo(0.7);
       btnRestart.visible = false;
@@ -372,8 +367,6 @@
       musicaFundo = game.add.audio('music', 0.4);
       musicaFundo.play();
 
-
-
       //botaoMenu = game.add.image(540,450, 'menu');
       //botaoMenu.scale.setTo(1.2);
       //botaoMenu.visible = false;
@@ -382,7 +375,6 @@
       //botaoMenu.events.onInputOver.add(clicaOverMenu, this);
       //botaoMenu.events.onInputOut.add(clicaOutPlay, this);
 
-
       //CORAÇÕES
       vidas = game.add.group();
       for (var i = 0; i < 3; i++) {
@@ -390,7 +382,6 @@
         coracao.anchor.setTo(0.5, 0.5);
         coracao.scale.setTo(0.06, 0.06);
       }
-
 
       //EXPLOSÕES
       explosoes = game.add.group();
@@ -411,7 +402,6 @@
       //    padding: "20px"
       //});
 
-
       textoFim = game.add.text(game.world.centerX, game.world.centerY + 28, ' ', {
         font: '45px Sun',
         fill: '#fff',
@@ -424,33 +414,27 @@
       cursors = game.input.keyboard.createCursorKeys();
       atira = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-
       restart();
     }
 
     function backToMenu() {
-
       game.state.start("TelaMenu");
       musicaFundo.stop();
     }
 
     function mouseOverBtnMenu() {
-
       btnMenu.alpha = 1;
     }
 
     function mouseOverBtnRestart() {
-
       btnRestart.alpha = 1;
     }
 
     function mouseOutBtnMenu() {
-
       btnMenu.alpha = 0.4;
     }
 
     function mouseOutBtnRestart() {
-
       btnRestart.alpha = 0.4;
     }
 
@@ -520,11 +504,14 @@
         inimigoFires();
       }
 
-
       //Move o fundo
       fundo.tilePosition.y += 2;
-      fundo.tilePosition.x += 0.5;
+      fundo.tilePosition.x += dist;
       ilha.tilePosition.y += 2;
+
+      if (distancia % 800 === 0) {
+         dist += 0.2;
+      }
     }
 
     function ajustaVelocidadeBarco() {
@@ -653,10 +640,10 @@
       barcoinimigo.anchor.x = 0.5;
       barcoinimigo.anchor.y = 0.5;
 
-	  barcoinimigo.removeChildren();
-	  barcoinimigo.addChild(aguaBarcoInimigo);
-	  //aguaBarcoInimigo.sendToBack();
-	  //fundo.sendToBack();
+      barcoinimigo.removeChildren();
+      barcoinimigo.addChild(aguaBarcoInimigo);
+      //aguaBarcoInimigo.sendToBack();
+      //fundo.sendToBack();
     }
 
     function liberaPedras() {
@@ -817,7 +804,7 @@
       //resets the life count
       vidas.callAll('revive');
       //  And brings the aliens back from the dead :)
-
+      dist = 0.5;
       liberaAtirar = true;
       //Revive o barco
       barco.revive();
@@ -903,8 +890,6 @@
     var somBarcoRangendo
 
     this.create = function() {
-
-
 
       fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
       fundo.scale.setTo(0.75, 0.75);
@@ -1033,8 +1018,6 @@
       fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
       fundo.scale.setTo(0.75, 0.75);
       fundo.anchor.setTo(0.5, 0.5);
-
-
 
     }
 
