@@ -864,18 +864,22 @@
 
 
     this.preload = function() {
-      game.load.crossOrigin = "anonymous";
+        game.load.crossOrigin = "anonymous";
 
-      game.load.image('tela', 'Sprites/fundo.jpg', 1280, 720);
-      game.load.spritesheet('btnPlay', 'Sprites/BotaoPlay.png');
-      game.load.spritesheet('btnPlayOver', 'Sprites/BotaoPlayHover.png');
-      game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
-      game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
-      game.load.image('tela2', 'Sprites/escritos.png');
-      game.load.image('tela3', 'Sprites/texto.png');
-
-      game.load.audio('barcoRangendo', 'Sons/ShipCreaking.mp3');
-      game.load.audio('somBotao', 'Sons/somBotao.mp3');
+        game.load.image('tela', 'Sprites/fundo.jpg', 1280, 720);
+        game.load.spritesheet('btnPlay', 'Sprites/BotaoPlay.png');
+        game.load.spritesheet('btnPlayOver', 'Sprites/BotaoPlayHover.png');
+        game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
+        game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
+        game.load.spritesheet('btnVoltar', 'Sprites/BotaoVoltar.png');
+        game.load.spritesheet('btnVoltarOver', 'Sprites/BotaoVoltarOver.png');
+        game.load.image('tela2', 'Sprites/escritos.png');
+        game.load.image('tela3', 'Sprites/texto.png');
+        game.load.image('loja1', 'Sprites/loja1.png');
+        game.load.image('loja2', 'Sprites/loja2.png');
+    
+        game.load.audio('barcoRangendo', 'Sons/ShipCreaking.mp3');
+        game.load.audio('somBotao', 'Sons/somBotao.mp3');
 
     }
 
@@ -884,48 +888,69 @@
     var btnPlayOver;
     var btnLojaOver;
     var fundo;
+    var btnVoltar;
+    var btnVoltarOver;
 
     var somBotao;
-    var somBarcoRangendo
+    var somBarcoRangendo;    
+    var tela2;
+    var tela3;
+    var loja1;
+    var loja2;
 
     this.create = function() {
 
-      fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
-      fundo.scale.setTo(0.75, 0.75);
-      fundo.anchor.setTo(0.5, 0.5);
+        fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
+        fundo.scale.setTo(0.75, 0.75);
+        fundo.anchor.setTo(0.5, 0.5);
+    
+        game.physics.enable(fundo, Phaser.Physics.ARCADE);
+    
+        tela2 = game.add.tileSprite(640, 330, 1920, 1080, 'tela2');
+        tela2.scale.setTo(0.75, 0.75);
+        tela2.anchor.setTo(0.5, 0.5);
+    
+        tela3 = game.add.tileSprite(640, 320, 1920, 1080, 'tela3');
+        tela3.scale.setTo(0.75, 0.75);
+        tela3.anchor.setTo(0.5, 0.5);
+        
+        loja2 = game.add.tileSprite (-70, -800, 1920, 1080, 'loja2');
+        loja2.scale.setTo(0.75, 0.75);  
+        loja1 = game.add.tileSprite (-70, -800, 1920, 1080, 'loja1');
+        loja1.scale.setTo(0.75, 0.75);  
+        
+        
+        btnPlay = game.add.image(450, 550, 'btnPlay');
+        btnPlay.scale.setTo(0.666, 0.666);
+    
+        btnLoja = game.add.image(675, 550, 'btnLoja');
+        btnLoja.scale.setTo(0.666, 0.666);
+    
+        btnPlay.inputEnabled = true;
+        btnPlay.events.onInputDown.add(clica, this);
+    
+        btnLoja.inputEnabled = true;
+        btnLoja.events.onInputDown.add(clicaLoja, this);
+    
+        btnPlay.events.onInputOver.add(clicaOverPlay, this);
+        btnLoja.events.onInputOver.add(clicaOverLoja, this);
+    
+        btnPlay.events.onInputOut.add(clicaOutPlay, this);
+        btnLoja.events.onInputOut.add(clicaOutLoja, this);
+        
+        btnVoltar = game.add.image(0, -800, 'btnVoltar');
+        btnVoltar.scale.setTo(0.666, 0.666);
+        btnVoltar.inputEnabled = true;
+        btnVoltar.events.onInputDown.add(voltarLoja, this);
+        btnVoltar.events.onInputOver.add(voltarOver, this);
+        btnVoltar.events.onInputOut.add(voltarOut, this);
+    
+        somBarcoRangendo = game.add.audio('barcoRangendo');
+        somBarcoRangendo.play();
+    
+        somBotao = game.add.audio('somBotao');
+        
 
-      game.physics.enable(fundo, Phaser.Physics.ARCADE);
-
-      var tela2 = game.add.tileSprite(640, 330, 1920, 1080, 'tela2');
-      tela2.scale.setTo(0.75, 0.75);
-      tela2.anchor.setTo(0.5, 0.5);
-
-      var tela3 = game.add.tileSprite(640, 320, 1920, 1080, 'tela3');
-      tela3.scale.setTo(0.75, 0.75);
-      tela3.anchor.setTo(0.5, 0.5);
-
-      btnPlay = game.add.image(450, 550, 'btnPlay');
-      btnPlay.scale.setTo(0.666, 0.666);
-
-      btnLoja = game.add.image(675, 550, 'btnLoja');
-      btnLoja.scale.setTo(0.666, 0.666);
-
-      btnPlay.inputEnabled = true;
-      btnPlay.events.onInputDown.add(clica, this);
-
-      btnLoja.inputEnabled = true;
-      btnLoja.events.onInputDown.add(goLoja, this);
-
-      btnPlay.events.onInputOver.add(clicaOverPlay, this);
-      btnLoja.events.onInputOver.add(clicaOverLoja, this);
-
-      btnPlay.events.onInputOut.add(clicaOutPlay, this);
-      btnLoja.events.onInputOut.add(clicaOutLoja, this);
-
-      somBarcoRangendo = game.add.audio('barcoRangendo');
-      somBarcoRangendo.play();
-
-      somBotao = game.add.audio('somBotao');
     }
 
     function clica() {
@@ -933,27 +958,58 @@
       somBotao.play();
       somBarcoRangendo.stop();
     }
-
-    function goLoja() {
-
-      game.state.start("TelaLoja");
-      somBotao.play();
-      somBarcoRangendo.stop();
+      
+    function clicaLoja() {
+        
+        tela2.alpha = 0;
+        tela3.alpha = 0;
+        btnPlay.kill();
+        btnLoja.kill();
+        btnVoltar.revive();
+        
+        
+        game.add.tween(loja1).to({y:-45},750).start();
+        game.add.tween(loja2).to({y:-250},750).start();
+        game.add.tween(btnVoltar).to({y:0},750).start();
     }
-
+      
+    function voltarLoja() {
+        
+        tela2.alpha = 1;
+        tela3.alpha = 1;
+        btnPlay.revive();
+        btnLoja.revive(); 
+        btnVoltar.kill();
+          
+        loja1.position.y = -800;
+        loja2.position.y = -800;
+        btnVoltar.position.y = -800;
+        loja2.alpha = 0;
+    }
+      
+    function voltarOver() {
+        btnVoltarOver = game.add.image(0, 0, 'btnVoltarOver');
+        btnVoltarOver.scale.setTo(0.666, 0.666);
+         
+    }
+    function voltarOut() {
+        btnVoltarOver.scale.setTo(0.666, 0.666);
+        btnVoltarOver.kill();
+    }
+      
     function clicaOverPlay() {
       btnPlayOver = game.add.image(450, 550, 'btnPlayOver');
       btnPlayOver.scale.setTo(0.666, 0.666);
+    }
+      
+    function clicaOutPlay() {
+      btnLoja.scale.setTo(0.666, 0.666);
+      btnPlayOver.kill();
     }
 
     function clicaOverLoja() {
       btnLojaOver = game.add.image(675, 550, 'btnLojaOver');
       btnLojaOver.scale.setTo(0.666, 0.666);
-    }
-
-    function clicaOutPlay() {
-      btnLoja.scale.setTo(0.666, 0.666);
-      btnPlayOver.kill();
     }
 
     function clicaOutLoja() {
@@ -965,7 +1021,21 @@
 
     this.update = function() {
 
-      fundo.angle = 4 * Math.sin(game.time.now * 0.0005) ;
+        fundo.angle = 4 * Math.sin(game.time.now * 0.0005);
+        
+        if ( loja1.position.y == -45 ){
+            
+        game.add.tween(loja2).to({y:-45},400).start();
+            loja2.alpha = 1;
+            
+        }
+        if ( loja1.position.y == -800){
+            
+            loja2.position.y = -800;
+            
+            
+            
+        }
     }
 
 
@@ -973,70 +1043,12 @@
       //game.debug.spriteBounds(barco);
     }
   }
-
-  function TelaLoja(game) {
-
-    // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
-    this.init = function() {
-
-      game.input.maxPointers = 1;
-
-      // Deixar o jogo executando, mesmo se o browser mudar de aba?
-      game.stage.disableVisibilityChange = false;
-
-      if (game.device.desktop) {
-        // Configurações específicas para desktop
-
-        // Como criamos o CSS acima, não precisamos centralizar via código
-        game.scale.pageAlignHorizontally = false;
-      } else {
-        // Configurações específicas para celulares
-
-        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        // Especifica o tamanho mímino e máximo para a área do jogo (de 400x300 até 800x600)
-        game.scale.setMinMax(400, 300, 1280, 720);
-        game.scale.forceLandscape = true;
-        // Como criamos o CSS acima, não precisamos centralizar via código
-        game.scale.pageAlignHorizontally = false;
-      }
-
-    }
-
-    var fundo;
-
-    this.preload = function() {
-      game.load.crossOrigin = "anonymous";
-
-      game.load.image('fundo', 'Sprites/fundo.jpg');
-
-
-    }
-
-    this.create = function() {
-
-      fundo = game.add.tileSprite(640, 360, 1920, 1080, 'tela');
-      fundo.scale.setTo(0.75, 0.75);
-      fundo.anchor.setTo(0.5, 0.5);
-
-    }
-
-    this.update = function() {
-
-      //fundo.angle = 4 * Math.sin(game.time.now * 0.0005) ;
-    }
-
-
-    this.render = function() {
-    }
-
-  }
   // Os estados do jogo podem ser entendidos como "telas" ou "cenários"
   // Se nosso jogo tivesse mais de uma "tela", bastaria adicionar as telas aqui,
   // dando nomes para cada uma (para alternar entre uma tela e outra, bastaria
   // executar jogo.state.start("Nome da tela") a qualquer momento)
   game.state.add("TelaInicial", TelaInicial);
   game.state.add("TelaMenu", TelaMenu);
-  game.state.add("TelaLoja", TelaLoja)
   //]]>
 
   </script>
