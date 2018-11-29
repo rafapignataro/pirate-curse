@@ -879,6 +879,7 @@
     
         game.load.audio('barcoRangendo', 'Sons/ShipCreaking.mp3');
         game.load.audio('somBotao', 'Sons/somBotao.mp3');
+        game.load.audio('SomBarcoMenu', 'Sons/SailSound.mp3');
 
     }
 
@@ -891,7 +892,8 @@
     var btnVoltarOver;
 
     var somBotao;
-    var somBarcoRangendo;    
+    var somBarcoRangendo; 
+    var SomBarcoVelejando;
     var tela2;
     var tela3;
     var loja1;
@@ -944,8 +946,11 @@
         btnVoltar.events.onInputOver.add(voltarOver, this);
         btnVoltar.events.onInputOut.add(voltarOut, this);
     
-        somBarcoRangendo = game.add.audio('barcoRangendo');
+        somBarcoRangendo  = game.add.audio('barcoRangendo', 0.6);
         somBarcoRangendo.play();
+        
+        SomBarcoVelejando = game.add.audio('SomBarcoMenu', 0.2);
+        SomBarcoVelejando.play();
     
         somBotao = game.add.audio('somBotao');
         
