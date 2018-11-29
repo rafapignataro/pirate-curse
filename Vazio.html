@@ -73,13 +73,15 @@
     return this.game.rnd.pick(list);
   };
 
-
   // Essa não é a forma mais "profissional" de fazer, mas é a mais simples :)
 
   // Vamos chamar a variável de game, para ficar igual ao sandbox!
   var game = new Phaser.Game(1280, 720, Phaser.AUTO, "divJogo");
   //Variaveis sprites
   var barco;
+  var barcoInvencivel;
+  var barcoPiscaTime;
+  var barcoPiscaVez;
   var aguaBarco;
   var cursors;
   var atira;
@@ -177,8 +179,6 @@
 
     }
 
-
-
     this.preload = function() {
       game.load.crossOrigin = "anonymous";
 
@@ -199,7 +199,7 @@
 
       //Sprites mapa
       game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560, 1440);
-      game.load.spritesheet('ilha', 'Sprites/ilhazinha2.png', 1280, 1080);
+      game.load.spritesheet('ilha', 'Sprites/ilhazinha.png', 1280, 1080);
       game.load.image('parede', 'Sprites/Colisor2.png');
 
       //MENU IN GAME
@@ -478,13 +478,15 @@
 
       game.physics.arcade.collide(barco, [parede, parede2]);
 
-      tipoVerificacao = 0;
-      game.physics.arcade.overlap(barco, pedras, collisionHandler, null, this);
-      tipoVerificacao = 1;
-      game.physics.arcade.overlap(barco, barcoInimigo, collisionHandler, null, this);
-      game.physics.arcade.overlap(barco, barcoInimigo2, collisionHandler, null, this);
-      tipoVerificacao = 2;
-      game.physics.arcade.overlap(barco, balasInimigas, collisionHandler, null, this);
+      if (!barcoInvencivel) {
+		  tipoVerificacao = 0;
+		  game.physics.arcade.overlap(barco, pedras, collisionHandler, null, this);
+		  tipoVerificacao = 1;
+		  game.physics.arcade.overlap(barco, barcoInimigo, collisionHandler, null, this);
+		  game.physics.arcade.overlap(barco, barcoInimigo2, collisionHandler, null, this);
+		  tipoVerificacao = 2;
+		  game.physics.arcade.overlap(barco, balasInimigas, collisionHandler, null, this);
+	  }
 
       game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
       game.physics.arcade.overlap(balas, barcoInimigo2, collisionHandler2, null, this);
@@ -523,6 +525,21 @@
       if (distancia % 800 === 0) {
         dist += 0.2;
       }
+	  
+		if (barcoInvencivel) {
+			if (game.time.now >= barcoPiscaTime) {
+				barcoPiscaTime = game.time.now + 100;
+				barcoPiscaVez++;
+				if ((barcoPiscaVez & 1)) {
+					barco.visible = true;
+					if (barcoPiscaVez >= 21) {
+						barcoInvencivel = false;
+					}
+				} else {
+					barco.visible = false;
+				}
+			}
+		}
     }
 
     function ajustaVelocidadeBarco() {
@@ -610,7 +627,6 @@
       barco.body.acceleration.y = a;
     }
 
-
     function contaDistancia() {
 
       distancia++;
@@ -625,6 +641,32 @@
       //textoInimigos.setText('Inimigos: ' + InimigosMortos);
     }
 
+	function obterCoordenadaSemInimigo2() {
+		var inimigosVivos = [];
+
+		barcoInimigo2.forEachAlive(function(barcoinimigo) {
+			inimigosVivos.push(barcoinimigo);
+		});
+	  
+		for(;;) {
+			var x = Math.random() * (900 - 272) + 272;
+			var livre = true;
+			var xMin = x - 20;
+			var xMax = x + 20;
+			for (var i = inimigosVivos.length - 1; i >= 0; i--) {
+				var inimigo = inimigosVivos[i];
+				if (xMax >= (inimigo.position.x - 36) && (inimigo.position.x + 36) >= xMin) {
+					livre = false;
+					break;
+				}
+			}
+			if (livre) {
+				return x;
+			}
+		}
+	  
+	}
+	
     function liberaBarcoInimigo() {
 
       var barcoinimigo = barcoInimigo.getRandomNotExists();
@@ -635,14 +677,15 @@
       aguaBarcoInimigo.animations.add("movimento2", [4, 3, 2, 1, 0], 12, true);
       aguaBarcoInimigo.animations.play("movimento2");
 
+	  var x = obterCoordenadaSemInimigo2();
       if (!barcoinimigo) {
-        barcoinimigo = barcoInimigo.create(Math.random() * (900 - 272) + 272, -100, 'barcoinimigo');
+        barcoinimigo = barcoInimigo.create(x, -100, 'barcoinimigo');
         barcoinimigo.outOfBoundsKill = false;
         barcoinimigo.checkWorldBounds = false;
       } else {
         barcoinimigo.outOfBoundsKill = false;
         barcoinimigo.checkWorldBounds = false;
-        barcoinimigo.reset(Math.random() * (900 - 272) + 272, -100);
+        barcoinimigo.reset(x, -100);
       }
       barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
       barcoinimigo.body.enable = true;
@@ -677,9 +720,10 @@
       }
       barcoinimigo.physicsBodyType = Phaser.Physics.ARCADE;
       barcoinimigo.body.enable = true;
-      barcoinimigo.body.velocity.y = 180;
+      barcoinimigo.body.velocity.y = 110;
       barcoinimigo.anchor.x = 0.5;
       barcoinimigo.anchor.y = 0.5;
+      barcoinimigo.scale.setTo(1.8);
 
       barcoinimigo.removeChildren();
       barcoinimigo.addChild(aguaBarcoInimigo);
@@ -726,8 +770,16 @@
       var vida = vidas.getFirstAlive();
 
       if (vida) {
-        vida.kill();
-      }
+		  if (!barcoInvencivel) {
+			vida.kill();
+			if (vidas.countLiving() >= 1) {
+				barcoInvencivel = true;
+				barcoPiscaTime = game.time.now + 100;
+				barcoPiscaVez = 0;
+				barco.visible = false;
+			}
+		  }
+	  }
 
       if (vidas.countLiving() < 1) {
 
@@ -842,6 +894,8 @@
       }
     }
 
+	var angulosTiros = [ 45 * Math.PI / 180, 90 * Math.PI / 180, 135 * Math.PI / 180, 225 * Math.PI / 180, 270 * Math.PI / 180, 315 * Math.PI / 180 ];
+	
     function inimigoFires2() {
       var balaInimiga = balasInimigas.getFirstExists(false);
 
@@ -857,49 +911,63 @@
         //Seleciona um inimigo aleatório
         var shooter = inimigosVivos[random];
 
-        //E o inimigo atirar
-        balaInimiga.reset(shooter.body.x + 16.5, shooter.body.y + 60);
+        var total = 0;
+		do {
+			//E o inimigo atirar
+			balaInimiga.reset(shooter.body.x + 16.5, shooter.body.y + 60);
 
-        game.physics.arcade.moveToObject(balaInimiga, barco, 400);
-        balaInimiga.scale.setTo(0.4, 0.4);
+			//game.physics.arcade.moveToObject(balaInimiga, barco, 400);
+
+			var a = angulosTiros[total];
+			var c = Math.cos(a);
+			var s = Math.sin(a);
+			balaInimiga.body.velocity.x = 400 * s;
+			balaInimiga.body.velocity.y = -400 * c;
+			balaInimiga.scale.setTo(0.4, 0.4);
+			
+			total++;
+			balaInimiga = balasInimigas.getFirstExists(false);
+		} while (total < angulosTiros.length && balaInimiga);
         firingTimer = game.time.now + 1300;
         explosion.play();
       }
     }
 
     function restart() {
-      //resets the life count
-      vidas.callAll('revive');
-      //  And brings the aliens back from the dead :)
-      dist = 0.5;
-      liberaAtirar = true;
-      //Revive o barco
-      barco.revive();
-      //esconde o texto
-      textoFim.visible = false;
-      //botaoMenu.visible = false;
-      menuImage.visible = false;
-      btnMenu.visible = false;
-      btnRestart.visible = false;
+		barcoInvencivel = false;
+		barcoPiscaTime = 0;
+		barcoPiscaVez = 0;
+		//resets the life count
+		vidas.callAll('revive');
+		//  And brings the aliens back from the dead :)
+		dist = 0.5;
+		liberaAtirar = true;
+		//Revive o barco
+		barco.revive();
+		//esconde o texto
+		textoFim.visible = false;
+		//botaoMenu.visible = false;
+		menuImage.visible = false;
+		btnMenu.visible = false;
+		btnRestart.visible = false;
 
-      musicaFundo.play();
+		musicaFundo.play();
 
-      distancia = 0;
-      InimigosMortos = 0;
-      //textoInimigos.text = "Inimigos: " + 0;
-      loopPedras = game.time.events.loop(2000, liberaPedras, this);
-      loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-      loopBarIni2 = game.time.events.loop(2000, liberaBarcoInimigo2, this);
-      loopDist = game.time.events.loop(100, contaDistancia, this);
-      barco.reset(640, 680);
-      barco.body.velocity.x = 0;
-      barco.body.velocity.y = 0;
-      barco.body.acceleration.x = 0;
-      barco.body.acceleration.y = 0;
-      barco.body.velocidadeAntigaX = 0;
-      barco.body.velocidadeAntigaY = 0;
+		distancia = 0;
+		InimigosMortos = 0;
+		//textoInimigos.text = "Inimigos: " + 0;
+		loopPedras = game.time.events.loop(2000, liberaPedras, this);
+		loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
+		loopBarIni2 = game.time.events.loop(20000, liberaBarcoInimigo2, this);
+		loopDist = game.time.events.loop(100, contaDistancia, this);
+		barco.reset(640, 680);
+		barco.body.velocity.x = 0;
+		barco.body.velocity.y = 0;
+		barco.body.acceleration.x = 0;
+		barco.body.acceleration.y = 0;
+		barco.body.velocidadeAntigaX = 0;
+		barco.body.velocidadeAntigaY = 0;
     }
-
 
   }
 
