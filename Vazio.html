@@ -137,6 +137,7 @@
   var coracao2;
   var coracao3;
   var vidas = 3;
+  var vidasInimigo2 = 3;
   var tipoVerificacao = 0;
 
   var liberaAtirar = true;
@@ -339,6 +340,7 @@
       barcoInimigo2.enableBody = true;
       barcoInimigo2.createMultiple(15, 'barcoinimigoSprite');
       barcoInimigo2.physicsBodyType = Phaser.Physics.ARCADE;
+      
 
       //Balas Inimigas
       balasInimigas = game.add.group();
@@ -489,13 +491,15 @@
 	  }
 
       game.physics.arcade.overlap(balas, barcoInimigo, collisionHandler2, null, this);
-      game.physics.arcade.overlap(balas, barcoInimigo2, collisionHandler2, null, this);
+      //game.physics.arcade.overlap(balas, barcoInimigo2, collisionHandler2, null, this);
 
       game.physics.arcade.overlap(balas, pedras, collisionHandler3, null, this);
       game.physics.arcade.overlap(balasInimigas, pedras, collisionHandler3, null, this);
+      game.physics.arcade.overlap(pedras, barcoInimigo2, collisionHandler3, null, this);
       game.physics.arcade.overlap(barcoInimigo, pedras, collisionHandler4, null, this);
-      game.physics.arcade.overlap(barcoInimigo2, pedras, collisionHandler4, null, this);
       game.physics.arcade.overlap(balas, balasInimigas, collisionHandler5, null, this);
+    
+      game.physics.arcade.overlap(balas, barcoInimigo2, collisionHandler6, null, this);
 
       ajustaVelocidadeBarco();
 
@@ -701,8 +705,9 @@
 
     function liberaBarcoInimigo2() {
 
+      vidasInimigo2 = 3;
       var barcoinimigo = barcoInimigo2.getRandomNotExists();
-
+            
       var aguaBarcoInimigo = game.make.sprite(0, 0, 'AguaMoveInimiga');
       aguaBarcoInimigo.scale.setTo(0.4);
       aguaBarcoInimigo.anchor.setTo(0.5, 0.67);
@@ -729,6 +734,9 @@
       barcoinimigo.addChild(aguaBarcoInimigo);
       //aguaBarcoInimigo.sendToBack();
       //fundo.sendToBack();
+    
+      balasInimigas.setAll('anchor.x', -1.5);
+      balasInimigas.setAll('anchor.y', -3);
     }
 
     function liberaPedras() {
@@ -839,6 +847,22 @@
       bala.kill();
       balaInimiga.kill();
     }
+      
+    function collisionHandler6(bala, barcoInimigo2) {
+      //var vidasInimigo2 = 3;
+      bala.kill();
+      //if (vidasInimigo2) {			
+        vidasInimigo2--;
+	  //
+
+      if (vidasInimigo2 < 1) {
+        barcoInimigo2.kill();
+      }
+      var explosao = explosoes.getFirstExists(false);
+      explosao.reset((barcoInimigo2.body.x), (barcoInimigo2.body.y+49.05));
+      explosao.animations.add('explode');
+      explosao.play('explode', 180, false, true);
+    }
 
     function fire() {
 
@@ -863,7 +887,7 @@
           bala.body.velocity.y = -525 * c;
 
           bulletTime = game.time.now + 25;
-          bala.scale.setTo(0.32, 0.32);
+          bala.scale.setTo(0.4, 0.4);
         }
       }
 
@@ -956,9 +980,9 @@
 		distancia = 0;
 		InimigosMortos = 0;
 		//textoInimigos.text = "Inimigos: " + 0;
-		loopPedras = game.time.events.loop(2000, liberaPedras, this);
-		loopBarIni = game.time.events.loop(2000, liberaBarcoInimigo, this);
-		loopBarIni2 = game.time.events.loop(20000, liberaBarcoInimigo2, this);
+		loopPedras = game.time.events.loop(3000, liberaPedras, this);
+		loopBarIni = game.time.events.loop(2500, liberaBarcoInimigo, this);
+		loopBarIni2 = game.time.events.loop(15000, liberaBarcoInimigo2, this);
 		loopDist = game.time.events.loop(100, contaDistancia, this);
 		barco.reset(640, 680);
 		barco.body.velocity.x = 0;
