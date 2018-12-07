@@ -151,6 +151,8 @@
   var dist = 0.5;
   var musicaFundo
 
+  var contaInimigosMortos = 0;
+
   function TelaInicial(game) {
 
     // A função init() não aparecia no sandbox porque eles fazem ela por nós lá! :)
@@ -802,13 +804,12 @@
         game.time.events.remove(loopBarIni2);
         game.time.events.remove(loopDist);
 
-        textoFim.text = distancia;
+        textoFim.text = Math.round(distancia * (1 + (contaInimigosMortos/100)));
         textoFim.visible = true;
 
         btnMenu.visible = true;
         btnRestart.visible = true;
         menuImage.visible = true;
-
 
         //botaoMenu.visible = true;
       }
@@ -826,6 +827,8 @@
       explosao.reset(barcoinimigo.body.x, barcoinimigo.body.y);
       explosao.animations.add('explode');
       explosao.play('explode', 180, false, true);
+
+      contaInimigosMortos++;
 
       contaInimigos();
     }
@@ -857,6 +860,7 @@
 
       if (vidasInimigo2 < 1) {
         barcoInimigo2.kill();
+        contaInimigosMortos++;
       }
       var explosao = explosoes.getFirstExists(false);
       explosao.reset((barcoInimigo2.body.x), (barcoInimigo2.body.y+49.05));
@@ -1020,9 +1024,7 @@
         // Como criamos o CSS acima, não precisamos centralizar via código
         game.scale.pageAlignHorizontally = false;
       }
-
     }
-
 
     this.preload = function() {
       game.load.crossOrigin = "anonymous";
@@ -1133,7 +1135,6 @@
       btnLoja.kill();
       btnVoltar.revive();
 
-
       game.add.tween(loja1).to({
         y: -45
       }, 750).start();
@@ -1207,9 +1208,6 @@
       if (loja1.position.y == -800) {
 
         loja2.position.y = -800;
-
-
-
       }
     }
 
