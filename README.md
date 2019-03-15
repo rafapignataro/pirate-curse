@@ -1,1 +1,1 @@
-Projeto interdisciplinar do primeiro semestre(2018_2) de TECH ESPM
+Iniciar game um um servidor, sendo o vazio.html o principal arquivo
