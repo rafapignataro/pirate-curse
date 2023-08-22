@@ -1,9 +1,7 @@
 # Pirate Curse
 
-<div style="display: flex; gap: .5rem; margin-bottom: 1rem;">
-  <img src="Sprites/home.png" width="50%" />
-  <img src="Sprites/game.png" width="50%" />
-</div>
+![Game home](Sprites/home.png "Game Home") 
+![In Game](Sprites/game.png "In Game")
 
 Web game developed in the first semester of college. Made by Rafael Pignataro, Vinicius Junqueira and Lucas Zillig.
 
