@@ -21,3 +21,4 @@ This starts your app in development mode, rebuilding assets on file changes.
 Access the server url in the browser. If you used Live Server probably the url is: **http://127.0.0.1:5500**.
 
 ### 3. Now click play and have some fun
+
