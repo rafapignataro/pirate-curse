@@ -138,29 +138,29 @@ function TelaInicial(game) {
   this.preload = function () {
     game.load.crossOrigin = "anonymous";
 
-    game.load.image('ship', 'Sprites/fragatinha.png');
-    game.load.spritesheet('AguaMove', 'Sprites/WaterEffect.png', 158, 430);
-    game.load.spritesheet('AguaMoveInimiga', 'Sprites/WaterEffectInimigo.png', 158, 430);
-    game.load.image('barcoinimigo', 'Sprites/Fragatinha3.png');
-    game.load.image('barcoinimigoSprite', 'Sprites/Fragatinha4.png');
-    game.load.image('missil1', 'Sprites/cannon_ball.png');
-    game.load.image('balaInimiga', 'Sprites/cannon_ball.png');
-    game.load.image('coracao', 'Sprites/vida2.png');
-    game.load.image('pedra', 'Sprites/pedra1.png');
-    game.load.image('pedra2', 'Sprites/pedra2.png');
-    game.load.image('pedra3', 'Sprites/pedra3.png');
+    game.load.image('ship', 'images/fragatinha.png');
+    game.load.spritesheet('AguaMove', 'images/WaterEffect.png', 158, 430);
+    game.load.spritesheet('AguaMoveInimiga', 'images/WaterEffectInimigo.png', 158, 430);
+    game.load.image('barcoinimigo', 'images/Fragatinha3.png');
+    game.load.image('barcoinimigoSprite', 'images/Fragatinha4.png');
+    game.load.image('missil1', 'images/cannon_ball.png');
+    game.load.image('balaInimiga', 'images/cannon_ball.png');
+    game.load.image('coracao', 'images/vida2.png');
+    game.load.image('pedra', 'images/pedra1.png');
+    game.load.image('pedra2', 'images/pedra2.png');
+    game.load.image('pedra3', 'images/pedra3.png');
 
     //ANIMAÇÕES
-    game.load.spritesheet('explode', 'Sprites/explosion.png', 64, 64);
+    game.load.spritesheet('explode', 'images/explosion.png', 64, 64);
 
     //Sprites mapa
-    game.load.spritesheet('waterP', 'Sprites/marLoop2.jpg', 2560, 1440);
-    game.load.spritesheet('ilha', 'Sprites/ilhazinha.png', 1280, 1080);
-    game.load.image('parede', 'Sprites/Colisor2.png');
+    game.load.spritesheet('waterP', 'images/marLoop2.jpg', 2560, 1440);
+    game.load.spritesheet('ilha', 'images/ilhazinha.png', 1280, 1080);
+    game.load.image('parede', 'images/Colisor2.png');
 
     //MENU IN GAME
-    game.load.image('telaScore', 'Sprites/telaScore.png');
-    game.load.image('btnMenu', 'Sprites/btnHighLight.png');
+    game.load.image('telaScore', 'images/telaScore.png');
+    game.load.image('btnMenu', 'images/btnHighLight.png');
 
     //AUDIOS
     game.load.audio('explosion', 'http://examples.phaser.io/assets/audio/SoundEffects/explosion.mp3');
@@ -982,17 +982,17 @@ function TelaMenu(game) {
   this.preload = function () {
     game.load.crossOrigin = "anonymous";
 
-    game.load.image('tela', 'Sprites/fundo.jpg', 1280, 720);
-    game.load.spritesheet('btnPlay', 'Sprites/BotaoPlay.png');
-    game.load.spritesheet('btnPlayOver', 'Sprites/BotaoPlayHover.png');
-    game.load.spritesheet('btnLoja', 'Sprites/BotaoLoja.png');
-    game.load.spritesheet('btnLojaOver', 'Sprites/BotaoLojaHover.png');
-    game.load.spritesheet('btnVoltar', 'Sprites/BotaoVoltar.png');
-    game.load.spritesheet('btnVoltarOver', 'Sprites/BotaoVoltarOver.png');
-    game.load.image('tela2', 'Sprites/escritos.png');
-    game.load.image('tela3', 'Sprites/texto.png');
-    game.load.image('loja1', 'Sprites/loja1.png');
-    game.load.image('loja2', 'Sprites/loja2.png');
+    game.load.image('tela', 'images/fundo.jpg', 1280, 720);
+    game.load.spritesheet('btnPlay', 'images/BotaoPlay.png');
+    game.load.spritesheet('btnPlayOver', 'images/BotaoPlayHover.png');
+    game.load.spritesheet('btnLoja', 'images/BotaoLoja.png');
+    game.load.spritesheet('btnLojaOver', 'images/BotaoLojaHover.png');
+    game.load.spritesheet('btnVoltar', 'images/BotaoVoltar.png');
+    game.load.spritesheet('btnVoltarOver', 'images/BotaoVoltarOver.png');
+    game.load.image('tela2', 'images/escritos.png');
+    game.load.image('tela3', 'images/texto.png');
+    game.load.image('loja1', 'images/loja1.png');
+    game.load.image('loja2', 'images/loja2.png');
 
     game.load.audio('barcoRangendo', 'audios/ShipCreaking.mp3');
     game.load.audio('somBotao', 'audios/somBotao.mp3');
